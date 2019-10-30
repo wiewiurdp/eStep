@@ -6,22 +6,39 @@ use App\Entity\Booking;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
 class BookingType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array                $options
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('start')
-            ->add('end')
+            ->add('start',
+                DateTimeType::class,
+                [
+                    'widget' => 'single_text',
+                ]
+            )
+            ->add('end',
+                DateTimeType::class,
+                [
+                    'widget' => 'single_text',
+                ]
+            )
             ->add('description')
             ->add('location')
             ->add('recurrence')
-            ->add('summary')
-        ;
+            ->add('summary');
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    /**
+     * @param OptionsResolver $resolver
+     */
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Booking::class,
