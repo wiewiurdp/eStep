@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Booking;
+use App\Form\EventListener\AddfieldToDisabledInEditViewSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -17,6 +18,7 @@ class BookingType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('summary')
             ->add('start',
                 DateTimeType::class,
                 [
@@ -30,9 +32,9 @@ class BookingType extends AbstractType
                 ]
             )
             ->add('description')
-            ->add('location')
-            ->add('recurrence')
-            ->add('summary');
+            ->add('location');
+
+        $builder->addEventSubscriber(new AddfieldToDisabledInEditViewSubscriber());
     }
 
     /**

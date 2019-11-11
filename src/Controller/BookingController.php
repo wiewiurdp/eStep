@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace App\Controller;
 
+use App\Service\BookingService;
 use App\Service\GoogleCalendarService;
 use App\Entity\Booking;
 use App\Form\BookingType;
@@ -17,11 +20,20 @@ use Symfony\Component\Routing\Annotation\Route;
 class BookingController extends AbstractController
 {
     private $googleCalendarService;
+    /**
+     * @var BookingService
+     */
+    private $bookingService;
 
-    public function __construct(GoogleCalendarService $googleCalendarService)
+    /**
+     * @param GoogleCalendarService $googleCalendarService
+     * @param BookingService        $bookingService
+     */
+    public function __construct(GoogleCalendarService $googleCalendarService, BookingService $bookingService)
     {
 
         $this->googleCalendarService = $googleCalendarService;
+        $this->bookingService = $bookingService;
     }
 
     /**
@@ -43,7 +55,7 @@ class BookingController extends AbstractController
     public function code(Request $request): Response
     {
         if ($request->query->get('code')) {
-            $this->googleCalendarService->getClient($request->get('code'));
+            $this->googleCalendarService->getClient($request->query->get('code'));
         } else {
             $this->googleCalendarService->getClient();
         }
@@ -71,20 +83,24 @@ class BookingController extends AbstractController
     public function new(Request $request): Response
     {
         $booking = new Booking();
-        $booking->setStart(new \DateTime('today'));
-        $booking->setEnd(new \DateTime('today'));
+        $today = new \DateTime('today');
+        $booking->setStart($today);
+        $booking->setEnd($today);
 
         $form = $this->createForm(BookingType::class, $booking);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $event = $this->googleCalendarService->addEvent($booking);
-            $booking->setGoogleId($event->getId());
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($booking);
-            $entityManager->flush();
 
-            return $this->redirectToRoute('booking_calendar');
+            if ($event->getRecurrence()) {
+                $events = $this->googleCalendarService->getService()->events->instances(GoogleCalendarService::CALENDAR_ID, $event->getId());
+                $this->bookingService->saveRecurrenceBookings($booking, $events);
+            } else {
+                $this->bookingService->saveBooking($booking, $event);
+            }
+
+            return $this->redirectToRoute('booking_index');
         }
 
         return $this->render('booking/new.html.twig', [
@@ -98,6 +114,7 @@ class BookingController extends AbstractController
      */
     public function show(Booking $booking): Response
     {
+
         return $this->render('booking/show.html.twig', [
             'booking' => $booking,
         ]);
@@ -115,7 +132,7 @@ class BookingController extends AbstractController
             $this->googleCalendarService->editEvent($booking);
             $this->getDoctrine()->getManager()->flush();
 
-            return $this->redirectToRoute('booking_index');
+            return $this->redirectToRoute('booking_calendar');
         }
 
         return $this->render('booking/edit.html.twig', [
@@ -136,6 +153,6 @@ class BookingController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('booking_index');
+        return $this->redirectToRoute('booking_calendar');
     }
 }

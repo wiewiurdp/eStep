@@ -49,6 +49,11 @@ class Booking
     private $recurrence;
 
     /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $recurrenceFinishedOn;
+
+    /**
      * @Assert\NotBlank()
      *
      * @ORM\Column(type="string", length=255)
@@ -71,6 +76,22 @@ class Booking
     public function getCreatedAt(): \DateTimeInterface
     {
         return $this->createdAt;
+    }
+
+    /**
+     * @return \DateTimeInterface|null
+     */
+    public function getRecurrenceFinishedOn(): ?\DateTimeInterface
+    {
+        return $this->recurrenceFinishedOn;
+    }
+
+    /**
+     * @param mixed $recurrenceFinishedOn
+     */
+    public function setRecurrenceFinishedOn($recurrenceFinishedOn): void
+    {
+        $this->recurrenceFinishedOn = $recurrenceFinishedOn;
     }
 
     /**

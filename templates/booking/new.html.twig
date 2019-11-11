@@ -8,4 +8,21 @@
     {{ include('booking/_form.html.twig') }}
 
     <a href="{{ path('booking_index') }}">back to list</a>
+
+
 {% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        var $rec = $('.test_rec'), $fin = $('.test_fin');
+        $rec.change(function () {
+            if ($rec.val() !== '0') {
+                $fin.removeAttr('disabled');
+            } else {
+                $fin.prop('disabled', true);
+            }
+        }); // added trigger to calculate initial state
+    </script>
+{% endblock %}
+

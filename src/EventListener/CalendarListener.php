@@ -1,10 +1,5 @@
 <?php
 
-/**
- * Copyright © Bold Brand Commerce Sp. z o.o. All rights reserved.
- * See LICENSE.txt for license details.
- */
-
 declare(strict_types = 1);
 
 namespace App\EventListener;
@@ -39,6 +34,12 @@ class CalendarListener
      */
     private $bookingService;
 
+    /**
+     * @param BookingRepository     $bookingRepository
+     * @param UrlGeneratorInterface $router
+     * @param GoogleCalendarService $googleCalendarService
+     * @param BookingService        $bookingService
+     */
     public function __construct(
         BookingRepository $bookingRepository,
         UrlGeneratorInterface $router,

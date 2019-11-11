@@ -61,6 +61,7 @@ class GoogleCalendarService
     protected $authUrl;
 
     /**
+     * @param EntityManagerInterface $em
      */
     public function __construct(EntityManagerInterface $em)
     {
@@ -110,12 +111,15 @@ class GoogleCalendarService
         }
         // Refresh the token if it's expired.
         if ($this->client->isAccessTokenExpired()) {
+
             if (!$this->refreshToken->isHit()) {
                 $this->refreshToken->set($this->client->getRefreshToken());
                 $this->cache->save($this->refreshToken);
             }
+
             if ($this->refreshToken->isHit()) {
                 $res = $this->client->fetchAccessTokenWithRefreshToken($this->refreshToken->get());
+
                 if (!isset($res['access_token'])) {
                     $this->authUrl = $this->client->createAuthUrl();
                     return null;
@@ -138,6 +142,7 @@ class GoogleCalendarService
      */
     public function getAccessToken(): ?array
     {
+
         if (!$this->accessToken->isHit()) {
             return null;
         }
@@ -165,11 +170,17 @@ class GoogleCalendarService
             'description' => $booking->getDescription(),
             'start' => [
                 'dateTime' => $booking->getStart()->format('Y-m-d\TH:i:sP'),
+                "timeZone" => "Europe/Warsaw",
             ],
             'end' => [
                 'dateTime' => $booking->getEnd()->format('Y-m-d\TH:i:sP'),
+                "timeZone" => "Europe/Warsaw",
             ],
         ]);
+
+        if ($booking->getRecurrence() && $booking->getRecurrenceFinishedOn()) {
+            $event->setRecurrence([sprintf('RRULE:FREQ=%s;UNTIL=%d', $booking->getRecurrence(), $booking->getRecurrenceFinishedOn()->format('Ymd'))]);
+        }
         return $this->getService()->events->insert(self::CALENDAR_ID, $event, ['sendNotifications' => true]);
     }
 
