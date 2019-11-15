@@ -111,6 +111,7 @@ class BookingService
      */
     public function saveBooking(Booking $booking, $event): void
     {
+        $location = $booking->getLocation();
         $booking->setGoogleId($event->getId());
         $this->entityManager->persist($booking);
         $this->entityManager->flush();
@@ -120,7 +121,7 @@ class BookingService
      * @param Booking                         $booking
      * @param \Google_Service_Calendar_Events $events
      */
-    public function saveRecurrenceBookings(Booking $booking, \Google_Service_Calendar_Events $events):void
+    public function saveRecurrenceBookings(Booking $booking, \Google_Service_Calendar_Events $events): void
     {
         /** @var \Google_Service_Calendar_Event $item */
         foreach ($events->getItems() as $item) {

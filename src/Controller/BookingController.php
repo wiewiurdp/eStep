@@ -4,11 +4,14 @@ declare(strict_types = 1);
 
 namespace App\Controller;
 
+use App\Repository\BatchRepository;
+use App\Repository\UserRepository;
 use App\Service\BookingService;
 use App\Service\GoogleCalendarService;
 use App\Entity\Booking;
 use App\Form\BookingType;
 use App\Repository\BookingRepository;
+use phpDocumentor\Reflection\DocBlock\Tags\Var_;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,16 +27,26 @@ class BookingController extends AbstractController
      * @var BookingService
      */
     private $bookingService;
+    /**
+     * @var BatchRepository
+     */
+    private $batchRepository;
+    /**
+     * @var UserRepository
+     */
+    private $userRepository;
 
     /**
      * @param GoogleCalendarService $googleCalendarService
      * @param BookingService        $bookingService
      */
-    public function __construct(GoogleCalendarService $googleCalendarService, BookingService $bookingService)
+    public function __construct(GoogleCalendarService $googleCalendarService, BookingService $bookingService, BatchRepository $batchRepository, UserRepository $userRepository)
     {
 
         $this->googleCalendarService = $googleCalendarService;
         $this->bookingService = $bookingService;
+        $this->batchRepository = $batchRepository;
+        $this->userRepository = $userRepository;
     }
 
     /**
@@ -82,11 +95,12 @@ class BookingController extends AbstractController
      */
     public function new(Request $request): Response
     {
+        $batches = $this->batchRepository->findAll();
+        $users =
         $booking = new Booking();
         $today = new \DateTime('today');
         $booking->setStart($today);
         $booking->setEnd($today);
-
         $form = $this->createForm(BookingType::class, $booking);
         $form->handleRequest($request);
 
@@ -104,6 +118,7 @@ class BookingController extends AbstractController
         }
 
         return $this->render('booking/new.html.twig', [
+            'batches' => $batches,
             'booking' => $booking,
             'form' => $form->createView(),
         ]);

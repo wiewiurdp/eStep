@@ -8,6 +8,7 @@
         "ext-pdo": "*",
         "doctrine/migrations": "1.8.x",
         "egulias/email-validator": "^2.1",
+        "friendsofsymfony/jsrouting-bundle": "^2.4",
         "google/apiclient": "^2.0",
         "guzzlehttp/guzzle": "^6.3",
         "imbo/behat-api-extension": "^2.1",

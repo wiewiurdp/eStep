@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Repository\BatchRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -69,6 +70,48 @@ class Booking
      * @ORM\Column(type="datetime")
      */
     private $modifiedAt;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="bookings")
+     */
+    private $users;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Batch", inversedBy="bookings")
+     */
+    private $batches;
+
+    /**
+     * @return Batch|null
+     */
+    public function getBatches(): ?Batch
+    {
+        return $this->batches;
+    }
+
+    /**
+     * @param Batch $batches
+     */
+    public function setBatches($batches): void
+    {
+        $this->batches = $batches;
+    }
+
+    /**
+     * @return User|null
+     */
+    public function getUsers(): ?User
+    {
+        return $this->users;
+    }
+
+    /**
+     * @param User $users
+     */
+    public function setUsers($users): void
+    {
+        $this->users = $users;
+    }
 
     /**
      * @return \DateTimeInterface

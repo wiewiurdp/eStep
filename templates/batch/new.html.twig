@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Batch{% endblock %}
+
+{% block body %}
+    <h1>Create new Batch</h1>
+
+    {{ include('batch/_form.html.twig') }}
+
+    <a href="{{ path('batch_index') }}">back to list</a>
+{% endblock %}
