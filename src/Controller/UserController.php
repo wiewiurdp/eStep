@@ -4,12 +4,17 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\UserType;
+use App\Repository\BatchRepository;
 use App\Repository\UserRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * @Route("/user")
@@ -20,13 +25,23 @@ class UserController extends AbstractController
      * @var UserRepository
      */
     private $userRepository;
+    /**
+     * @var BatchRepository
+     */
+    private $batchRepository;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
-     * @param UserRepository $userRepository
+     * @param UserRepository  $userRepository
+     * @param BatchRepository $batchRepository
      */
-    public function __construct(UserRepository $userRepository)
+    public function __construct(UserRepository $userRepository, BatchRepository $batchRepository)
     {
         $this->userRepository = $userRepository;
+        $this->batchRepository = $batchRepository;
     }
 
     /**
@@ -112,8 +127,28 @@ class UserController extends AbstractController
     public function getUsersByBatch(Request $request, int $batchId)
     {
         if ($request->isXmlHttpRequest()) {
-            $this->userRepository->findByBatch($batchId);
+            $batch = $this->batchRepository->find($batchId);
+            $users = $batch->getUsers();
+
+            if ($users) {
+                $encoders = [
+                    new JsonEncoder(),
+                ];
+                $normalizers = [
+                    new ObjectNormalizer(),
+                ];
+                $serializer = new Serializer($normalizers, $encoders);
+                $data = $serializer->serialize($users, 'json',
+                    [
+                        'circular_reference_handler' => function ($object) {
+                            return $object->getId();
+                        },
+                    ]);
+
+                return new JsonResponse($data, 200, [], true);
+            }
         }
+
         return new JsonResponse("This function is only available in AJAX");
     }
 }

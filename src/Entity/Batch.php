@@ -11,6 +11,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Batch
 {
+    /**
+     * Batch constructor.
+     */
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -31,30 +34,41 @@ class Batch
     private $name;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="batches")
-     */
-    private $users;
-
-    /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\OneToMany(targetEntity="App\Entity\Role", mappedBy="batch")
      */
     private $roles;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="batches")
+     */
+    private $users;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Booking", inversedBy="batches")
      */
     private $bookings;
 
+    /**
+     * @return int|null
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    /**
+     * @return string|null
+     */
     public function getName(): ?string
     {
         return $this->name;
     }
 
+    /**
+     * @param string $name
+     *
+     * @return $this
+     */
     public function setName(string $name): self
     {
         $this->name = $name;
@@ -62,39 +76,126 @@ class Batch
         return $this;
     }
 
+    /**
+     * @return Collection
+     */
+    public function getRoles(): Collection
+    {
+        return $this->roles;
+    }
+
+    /**
+     * @param Role $role
+     *
+     * @return $this
+     */
+    public function addRole(Role $role): self
+    {
+        if (!$this->roles->contains($role)) {
+            $this->roles[] = $role;
+            $role->setBatch($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Role $role
+     *
+     * @return $this
+     */
+    public function removeRole(Role $role): self
+    {
+        if ($this->roles->contains($role)) {
+            $this->roles->removeElement($role);
+            // set the owning side to null (unless already changed)
+            if ($role->getBatch() === $this) {
+                $role->setBatch(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
     public function getUsers(): Collection
     {
         return $this->users;
     }
 
-    public function addUser(User $users): self
+    /**
+     * @param User $user
+     *
+     * @return $this
+     */
+    public function addUser(User $user): self
     {
-        $this->users = $users;
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
+            $user->addBatch($this);
+        }
 
         return $this;
     }
 
-    public function getRoles(): ?int
+    /**
+     * @param User $user
+     *
+     * @return $this
+     */
+    public function removeUser(User $user): self
     {
-        return $this->roles;
-    }
-
-    public function setRoles(?int $roles): self
-    {
-        $this->roles = $roles;
+        if ($this->users->contains($user)) {
+            $this->users->removeElement($user);
+            $user->removeBatch($this);
+        }
 
         return $this;
     }
 
-    public function getBookings(): ?int
+    /**
+     * @return Collection|Booking[]
+     */
+    public function getBookings(): Collection
     {
         return $this->bookings;
     }
 
-    public function setBookings(?int $bookings): self
+    /**
+     * @param Booking $booking
+     *
+     * @return $this
+     */
+    public function addBooking(Booking $booking): self
     {
-        $this->bookings = $bookings;
+        if (!$this->bookings->contains($booking)) {
+            $this->bookings[] = $booking;
+        }
 
         return $this;
+    }
+
+    /**
+     * @param Booking $booking
+     *
+     * @return $this
+     */
+    public function removeBooking(Booking $booking): self
+    {
+        if ($this->bookings->contains($booking)) {
+            $this->bookings->removeElement($booking);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->name;
     }
 }

@@ -10,9 +10,9 @@
             <tr>
                 <th>Id</th>
                 <th>Name</th>
-                <th>User</th>
-                <th>Role</th>
-                <th>Event</th>
+                <th>Users</th>
+                <th>Roles</th>
+                <th>Bookings</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -21,9 +21,21 @@
             <tr>
                 <td>{{ batch.id }}</td>
                 <td>{{ batch.name }}</td>
-                <td>{{ batch.user }}</td>
-                <td>{{ batch.role }}</td>
-                <td>{{ batch.event }}</td>
+                <td>
+                    {% for user in batch.users %}
+                        {{ user.name }} {{ user.surname }} |
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for role in batch.roles %}
+                        {{ role.name }}
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for booking in batch.bookings %}
+                        {{ booking.summary }}
+                    {% endfor %}
+                </td>
                 <td>
                     <a href="{{ path('batch_show', {'id': batch.id}) }}">show</a>
                     <a href="{{ path('batch_edit', {'id': batch.id}) }}">edit</a>

@@ -2,10 +2,15 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @UniqueEntity("mail")
  */
 class User
 {
@@ -27,7 +32,8 @@ class User
     private $surname;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @Assert\Email()
+     * @ORM\Column(type="string", length=255, unique=true)
      */
     private $mail;
 
@@ -37,30 +43,51 @@ class User
     private $address;
 
     /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Role", mappedBy="users")
+     */
+    private $roles;
+
+    /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Batch", inversedBy="users")
      */
     private $batches;
-
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $roles;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Booking", inversedBy="users")
      */
     private $bookings;
 
+    /**
+     * User constructor.
+     */
+    public function __construct()
+    {
+        $this->roles = new ArrayCollection();
+        $this->batches = new ArrayCollection();
+        $this->bookings = new ArrayCollection();
+    }
+
+    /**
+     * @return int|null
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    /**
+     * @return string|null
+     */
     public function getName(): ?string
     {
         return $this->name;
     }
 
+    /**
+     * @param string $name
+     *
+     * @return $this
+     */
     public function setName(string $name): self
     {
         $this->name = $name;
@@ -68,11 +95,19 @@ class User
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getSurname(): ?string
     {
         return $this->surname;
     }
 
+    /**
+     * @param string $surname
+     *
+     * @return $this
+     */
     public function setSurname(string $surname): self
     {
         $this->surname = $surname;
@@ -80,11 +115,19 @@ class User
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getMail(): ?string
     {
         return $this->mail;
     }
 
+    /**
+     * @param string $mail
+     *
+     * @return $this
+     */
     public function setMail(string $mail): self
     {
         $this->mail = $mail;
@@ -92,11 +135,19 @@ class User
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getAddress(): ?string
     {
         return $this->address;
     }
 
+    /**
+     * @param string|null $address
+     *
+     * @return $this
+     */
     public function setAddress(?string $address): self
     {
         $this->address = $address;
@@ -105,54 +156,120 @@ class User
     }
 
     /**
-     * @return Batch|null
+     * @return Collection|Role[]
      */
-    public function getBatches(): ?Batch
+    public function getRoles(): Collection
+    {
+        return $this->roles;
+    }
+
+    /**
+     * @param Role $role
+     *
+     * @return $this
+     */
+    public function addRole(Role $role): self
+    {
+        if (!$this->roles->contains($role)) {
+            $this->roles[] = $role;
+            $role->addUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Role $role
+     *
+     * @return $this
+     */
+    public function removeRole(Role $role): self
+    {
+        if ($this->roles->contains($role)) {
+            $this->roles->removeElement($role);
+            $role->removeUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Batch[]
+     */
+    public function getBatches(): Collection
     {
         return $this->batches;
     }
 
     /**
-     * @param Batch $batches
+     * @param Batch $batch
      *
      * @return $this
      */
-    public function setBatches(Batch $batches): self
+    public function addBatch(Batch $batch): self
     {
-        $this->batches = $batches;
-
-        return $this;
-    }
-
-    public function getRoles(): ?int
-    {
-        return $this->roles;
-    }
-
-    public function setRoles(?int $roles): self
-    {
-        $this->roles = $roles;
+        if (!$this->batches->contains($batch)) {
+            $this->batches[] = $batch;
+        }
 
         return $this;
     }
 
     /**
-     * @return Booking|null
+     * @param Batch $batch
+     *
+     * @return $this
      */
-    public function getBookings(): ?Booking
+    public function removeBatch(Batch $batch): self
+    {
+        if ($this->batches->contains($batch)) {
+            $this->batches->removeElement($batch);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Booking[]
+     */
+    public function getBookings(): Collection
     {
         return $this->bookings;
     }
 
     /**
-     * @param Booking $bookings
+     * @param Booking $booking
      *
      * @return $this
      */
-    public function setBookings(Booking $bookings): self
+    public function addBooking(Booking $booking): self
     {
-        $this->bookings = $bookings;
+        if (!$this->bookings->contains($booking)) {
+            $this->bookings[] = $booking;
+        }
 
         return $this;
+    }
+
+    /**
+     * @param Booking $booking
+     *
+     * @return $this
+     */
+    public function removeBooking(Booking $booking): self
+    {
+        if ($this->bookings->contains($booking)) {
+            $this->bookings->removeElement($booking);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return sprintf('%s %s', $this->name, $this->surname);
     }
 }

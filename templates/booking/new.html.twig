@@ -19,17 +19,12 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        var $rec = $('.reccurence'), $fin = $('.recurrenceFinishedOn');
-        $rec.change(function () {
-            if ($rec.val() !== '0') {
-                $fin.removeAttr('disabled');
-            } else {
-                $fin.prop('disabled', true);
-            }
-        }).trigger('change');
+        var data = {
+            available: [],
+            selected: []
+        };
     </script>
-
     <script src="{{ asset('js/picklist.js') }}"></script>
-    <script src="{{ asset('js/booking.new.js') }}"></script>
+    <script src="{{ asset('js/booking.js') }}"></script>
 {% endblock %}
 

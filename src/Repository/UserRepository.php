@@ -19,20 +19,20 @@ class UserRepository extends ServiceEntityRepository
         parent::__construct($registry, User::class);
     }
 
-    /**
-     * @param $batchId
-     *
-     * @return mixed
-     */
-    public function findByBatch($batchId)
-    {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.batch = :val')
-            ->setParameter('val', $batchId)
-            ->orderBy('u.id', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
+//    /**
+//     * @param $batchId
+//     *
+//     * @return mixed
+//     */
+//    public function findByBatch($batchId)
+//    {
+//        return $this->createQueryBuilder('u')
+//            ->andWhere('u.batch = :val')
+//            ->setParameter('val', $batchId)
+//            ->orderBy('u.id', 'ASC')
+//            ->getQuery()
+//            ->getResult();
+//    }
 
     /*
     public function findOneBySomeField($value): ?User
