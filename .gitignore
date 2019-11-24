@@ -5,9 +5,9 @@
 /.env.*.local
 /credentials.json
 /public/bundles/
+/public/cache/
 /var/
 /vendor/
-/public/
 /phpunit.xml
 .phpunit.result.cache
 .phpunit
