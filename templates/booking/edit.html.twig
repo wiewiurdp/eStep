@@ -2,7 +2,13 @@
 
 {% block title %}Edit Booking{% endblock %}
 
+   {% block stylesheets %}
+       {{ parent() }}
+       <link rel="stylesheet" href="{{ asset('css/picklist.css') }}">
+   {% endblock %}
+
 {% block body %}
+
     <h1>Edit Booking</h1>
 
     {{ include('booking/_form.html.twig', {'button_label': 'Update'}) }}
@@ -10,4 +16,19 @@
     <a href="{{ path('booking_index') }}">back to list</a>
 
     {{ include('booking/_delete_form.html.twig') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        var data = {
+            available: [],
+            selected: []
+        };
+        {% for user in booking.users %}
+        data.selected.push({id: '{{ user.id }}', label: '{{ user.name }} ' + '{{ user.surname }}' },);
+        {% endfor %}
+    </script>
+    <script src="{{ asset('js/picklist.js') }}"></script>
+    <script src="{{ asset('js/booking.js') }}"></script>
 {% endblock %}

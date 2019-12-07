@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Batch{% endblock %}
+
+{% block body %}
+    <h1>Edit Batch</h1>
+
+    {{ include('batch/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('batch_index') }}">back to list</a>
+
+    {{ include('batch/_delete_form.html.twig') }}
+{% endblock %}
