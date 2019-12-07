@@ -29,8 +29,10 @@ $('#batches').change(function () {
                     for (var i = 0; i < users.length; i++) {
                         var user = {};
                         user.id = users[i].id;
-                        user.label = users[i].name + ' ' + users[i].surname;
-                        user.mail = users[i].mail;
+                        user.label = users[i].name;
+                        if (users[i].role) {
+                            user.label = users[i].role + ' - ' + user.label
+                        }
                         for (var j = 0; j < picklist.selected.length; j++) {
                             if (user.id == picklist.selected[j].id) {
                                 continue loop1

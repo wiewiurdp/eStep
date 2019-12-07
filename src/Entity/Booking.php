@@ -95,9 +95,9 @@ class Booking
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getUsersJSON(): string
+    public function getUsersJSON(): ?string
     {
         return $this->usersJSON;
     }

@@ -21,8 +21,6 @@ class UserType extends AbstractType
             ->add('mail')
             ->add('address')
             ->add('batches')
-            ->add('roles')
-            ->add('bookings')
         ;
     }
 

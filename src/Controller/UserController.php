@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Role;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\BatchRepository;
+use App\Repository\RoleRepository;
 use App\Repository\UserRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,9 +14,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
 
 /**
  * @Route("/user")
@@ -33,15 +32,19 @@ class UserController extends AbstractController
      * @var LoggerInterface
      */
     private $logger;
+    /**
+     * @var RoleRepository
+     */
+    private $roleRepository;
 
     /**
-     * @param UserRepository  $userRepository
-     * @param BatchRepository $batchRepository
+     * UserController constructor.
+     *
+     * @param UserRepository $userRepository
      */
-    public function __construct(UserRepository $userRepository, BatchRepository $batchRepository)
+    public function __construct(UserRepository $userRepository)
     {
         $this->userRepository = $userRepository;
-        $this->batchRepository = $batchRepository;
     }
 
     /**
@@ -124,31 +127,42 @@ class UserController extends AbstractController
     /**
      * @Route("/getUsersByBatch/{batchId}", name="get_users_by_batch", methods={"GET"}, options={"expose"=true})
      */
-    public function getUsersByBatch(Request $request, int $batchId)
+    public function getUsersByBatch(Request $request, int $batchId): JsonResponse
     {
         if ($request->isXmlHttpRequest()) {
-            $batch = $this->batchRepository->find($batchId);
-            $users = $batch->getUsers();
-
-            if ($users) {
-                $encoders = [
-                    new JsonEncoder(),
-                ];
-                $normalizers = [
-                    new ObjectNormalizer(),
-                ];
-                $serializer = new Serializer($normalizers, $encoders);
-                $data = $serializer->serialize($users, 'json',
-                    [
-                        'circular_reference_handler' => function ($object) {
-                            return $object->getId();
-                        },
-                    ]);
-
-                return new JsonResponse($data, 200, [], true);
-            }
+            $usersObjects = $this->userRepository->getUsersByBatchId($batchId);
+            $usersAndRole = json_encode($this->getUsersAndRoleByBatchId($usersObjects, $batchId));
+            return new JsonResponse($usersAndRole, 200, [], true);
         }
 
-        return new JsonResponse("This function is only available in AJAX");
+        return new JsonResponse('This function is only available in AJAX');
     }
+
+    /**
+     * @param $usersObjects
+     * @param $batchId
+     *
+     * @return array
+     */
+    private function getUsersAndRoleByBatchId($usersObjects, $batchId): array
+    {
+        $usersAndRole = [];
+        /** @var User $userObject */
+        foreach ($usersObjects as $key => $userObject) {
+            $usersAndRole[$key]['id'] = $userObject->getId();
+            $usersAndRole[$key]['name'] = sprintf('%s %s', $userObject->getName(), $userObject->getSurname());
+            /** @var Role $role */
+            $usersAndRole[$key]['role'] = null;
+            foreach ($userObject->getRoles() as $role) {
+                if ($role->getBatch()->getId() === $batchId) {
+                    $usersAndRole[$key]['role'] = $role->getName();
+                }
+            }
+        }
+        $keys = array_column($usersAndRole, 'role');
+        array_multisort($keys, SORT_DESC, $usersAndRole);
+
+        return $usersAndRole;
+    }
+
 }
