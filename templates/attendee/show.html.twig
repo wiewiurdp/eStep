@@ -1,56 +1,56 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}User{% endblock %}
+{% block title %}Attendee{% endblock %}
 
 {% block body %}
-    <h1>User</h1>
+    <h1>Attendee</h1>
 
     <table class="table">
         <tbody>
         <tr>
             <th>Id</th>
-            <td>{{ user.id }}</td>
+            <td>{{ attendee.id }}</td>
         </tr>
         <tr>
             <th>Name</th>
-            <td>{{ user.name }}</td>
+            <td>{{ attendee.name }}</td>
         </tr>
         <tr>
             <th>Surname</th>
-            <td>{{ user.surname }}</td>
+            <td>{{ attendee.surname }}</td>
         </tr>
         <tr>
             <th>Mail</th>
-            <td>{{ user.mail }}</td>
+            <td>{{ attendee.mail }}</td>
         </tr>
         <tr>
             <th>Address</th>
-            <td>{{ user.address }}</td>
+            <td>{{ attendee.address }}</td>
         </tr>
         <tr>
             <th>Batches</th>
-            {% for batch in user.batches %}
+            {% for batch in attendee.batches %}
                 <td>{{ batch.name }}</td>
             {% endfor %}
         </tr>
         <tr>
             <th>Roles</th>
-            {% for role in user.roles %}
+            {% for role in attendee.roles %}
                 <td>{{ role.name }}</td>
             {% endfor %}
         </tr>
         <tr>
             <th>Booings</th>
-            {% for booking in user.bookings %}
+            {% for booking in attendee.bookings %}
                 <td>{{ booking.summary }}</td>
             {% endfor %}
         </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('user_index') }}">back to list</a>
+    <a href="{{ path('attendee_index') }}">back to list</a>
 
-    <a href="{{ path('user_edit', {'id': user.id}) }}">edit</a>
+    <a href="{{ path('attendee_edit', {'id': attendee.id}) }}">edit</a>
 
-    {{ include('user/_delete_form.html.twig') }}
+    {{ include('attendee/_delete_form.html.twig') }}
 {% endblock %}

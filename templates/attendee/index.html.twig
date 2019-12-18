@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}User index{% endblock %}
+{% block title %}Attendee index{% endblock %}
 
 {% block body %}
-    <h1>User index</h1>
+    <h1>Attendee index</h1>
 
     <table class="table">
         <thead>
@@ -20,31 +20,31 @@
         </tr>
         </thead>
         <tbody>
-        {% for user in users %}
+        {% for attendee in attendees %}
             <tr>
-                <td>{{ user.id }}</td>
-                <td>{{ user.name }}</td>
-                <td>{{ user.surname }}</td>
-                <td>{{ user.mail }}</td>
-                <td>{{ user.address }}</td>
+                <td>{{ attendee.id }}</td>
+                <td>{{ attendee.name }}</td>
+                <td>{{ attendee.surname }}</td>
+                <td>{{ attendee.mail }}</td>
+                <td>{{ attendee.address }}</td>
                 <td>
-                    {% for batch in user.batches %}
+                    {% for batch in attendee.batches %}
                         {{ batch.name }}
                     {% endfor %}
                 </td>
                 <td>
-                    {% for role in user.roles %}
+                    {% for role in attendee.roles %}
                         {{ role.name }}
                     {% endfor %}
                 </td>
                 <td>
-                    {% for booking in user.bookings %}
+                    {% for booking in attendee.bookings %}
                         {{ booking.summary }}
                     {% endfor %}
                 </td>
                 <td>
-                    <a href="{{ path('user_show', {'id': user.id}) }}">show</a>
-                    <a href="{{ path('user_edit', {'id': user.id}) }}">edit</a>
+                    <a href="{{ path('attendee_show', {'id': attendee.id}) }}">show</a>
+                    <a href="{{ path('attendee_edit', {'id': attendee.id}) }}">edit</a>
                 </td>
             </tr>
         {% else %}
@@ -55,5 +55,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('user_new') }}">Create new</a>
+    <a href="{{ path('attendee_new') }}">Create new</a>
 {% endblock %}

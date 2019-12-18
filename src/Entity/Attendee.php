@@ -9,10 +9,10 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\AttendeeRepository")
  * @UniqueEntity("mail")
  */
-class User
+class Attendee
 {
     /**
      * @ORM\Id()
@@ -43,22 +43,22 @@ class User
     private $address;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Role", mappedBy="users")
+     * @ORM\ManyToMany(targetEntity="App\Entity\Role", mappedBy="attendees")
      */
     private $roles;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Batch", inversedBy="users")
+     * @ORM\ManyToMany(targetEntity="App\Entity\Batch", inversedBy="attendees")
      */
     private $batches;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Booking", inversedBy="users")
+     * @ORM\ManyToMany(targetEntity="App\Entity\Booking", inversedBy="attendees")
      */
     private $bookings;
 
     /**
-     * User constructor.
+     * Attendee constructor.
      */
     public function __construct()
     {
@@ -172,7 +172,7 @@ class User
     {
         if (!$this->roles->contains($role)) {
             $this->roles[] = $role;
-            $role->addUser($this);
+            $role->addAttendee($this);
         }
 
         return $this;
@@ -187,7 +187,7 @@ class User
     {
         if ($this->roles->contains($role)) {
             $this->roles->removeElement($role);
-            $role->removeUser($this);
+            $role->removeAttendee($this);
         }
 
         return $this;

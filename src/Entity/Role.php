@@ -29,16 +29,16 @@ class Role
     private $batch;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="roles")
+     * @ORM\ManyToMany(targetEntity="Attendee", inversedBy="roles")
      */
-    private $users;
+    private $attendees;
 
     /**
      * Role constructor.
      */
     public function __construct()
     {
-        $this->users = new ArrayCollection();
+        $this->attendees = new ArrayCollection();
     }
 
     /**
@@ -90,36 +90,36 @@ class Role
     }
 
     /**
-     * @return Collection|User[]
+     * @return Collection|Attendee[]
      */
-    public function getUsers(): Collection
+    public function getAttendees(): Collection
     {
-        return $this->users;
+        return $this->attendees;
     }
 
     /**
-     * @param User $user
+     * @param Attendee $attendee
      *
      * @return $this
      */
-    public function addUser(User $user): self
+    public function addAttendee(Attendee $attendee): self
     {
-        if (!$this->users->contains($user)) {
-            $this->users[] = $user;
+        if (!$this->attendees->contains($attendee)) {
+            $this->attendees[] = $attendee;
         }
 
         return $this;
     }
 
     /**
-     * @param User $user
+     * @param Attendee $attendee
      *
      * @return $this
      */
-    public function removeUser(User $user): self
+    public function removeAttendee(Attendee $attendee): self
     {
-        if ($this->users->contains($user)) {
-            $this->users->removeElement($user);
+        if ($this->attendees->contains($attendee)) {
+            $this->attendees->removeElement($attendee);
         }
 
         return $this;

@@ -34,7 +34,7 @@ class BookingType extends AbstractType
             )
             ->add('description')
             ->add('location')
-            ->add('usersJSON', HiddenType::class);
+            ->add('attendeesJSON', HiddenType::class);
 
         $builder->addEventSubscriber(new AddfieldToDisabledInEditViewSubscriber());
     }
