@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -38,6 +39,21 @@ class User implements UserInterface
      */
     private $name;
 
+    /**
+     * @var UserPasswordEncoderInterface $passwordEncoder
+     */
+    private $passwordEncoder;
+
+    /**
+     * User constructor.
+     *
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     */
+    public function __construct(UserPasswordEncoderInterface $passwordEncoder)
+    {
+        $this->passwordEncoder = $passwordEncoder;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -62,7 +78,7 @@ class User implements UserInterface
      */
     public function getUsername(): string
     {
-        return (string) $this->email;
+        return (string)$this->email;
     }
 
     /**
@@ -89,12 +105,13 @@ class User implements UserInterface
      */
     public function getPassword(): string
     {
-        return (string) $this->password;
+        return (string)$this->password;
     }
 
     public function setPassword(string $password): self
     {
-        $this->password = $password;
+
+        $this->password = $this->passwordEncoder->encodePassword($this, $password);
 
         return $this;
     }

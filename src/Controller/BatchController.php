@@ -5,12 +5,15 @@ namespace App\Controller;
 use App\Entity\Batch;
 use App\Form\BatchType;
 use App\Repository\BatchRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
+ * @IsGranted("ROLE_USER")
+ *
  * @Route("/batch")
  */
 class BatchController extends AbstractController
@@ -83,7 +86,7 @@ class BatchController extends AbstractController
      */
     public function delete(Request $request, Batch $batch): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$batch->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $batch->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($batch);
             $entityManager->flush();
