@@ -130,39 +130,10 @@ class UserController extends AbstractController
     public function getUsersByBatch(Request $request, int $batchId): JsonResponse
     {
         if ($request->isXmlHttpRequest()) {
-            $usersObjects = $this->userRepository->getUsersByBatchId($batchId);
-            $usersAndRole = json_encode($this->getUsersAndRoleByBatchId($usersObjects, $batchId));
+            $usersAndRole = json_encode($this->userRepository->getUsersAndRoleByBatchId($batchId));
             return new JsonResponse($usersAndRole, 200, [], true);
         }
 
         return new JsonResponse('This function is only available in AJAX');
     }
-
-    /**
-     * @param $usersObjects
-     * @param $batchId
-     *
-     * @return array
-     */
-    private function getUsersAndRoleByBatchId($usersObjects, $batchId): array
-    {
-        $usersAndRole = [];
-        /** @var User $userObject */
-        foreach ($usersObjects as $key => $userObject) {
-            $usersAndRole[$key]['id'] = $userObject->getId();
-            $usersAndRole[$key]['name'] = sprintf('%s %s', $userObject->getName(), $userObject->getSurname());
-            /** @var Role $role */
-            $usersAndRole[$key]['role'] = null;
-            foreach ($userObject->getRoles() as $role) {
-                if ($role->getBatch()->getId() === $batchId) {
-                    $usersAndRole[$key]['role'] = $role->getName();
-                }
-            }
-        }
-        $keys = array_column($usersAndRole, 'role');
-        array_multisort($keys, SORT_DESC, $usersAndRole);
-
-        return $usersAndRole;
-    }
-
 }

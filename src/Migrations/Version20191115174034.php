@@ -29,7 +29,6 @@ final class Version20191115174034 extends AbstractMigration
         $this->addSql('ALTER TABLE role ADD CONSTRAINT FK_57698A6ABA3B8694 FOREIGN KEY (batches_id) REFERENCES batch (id)');
         $this->addSql('ALTER TABLE role_user ADD CONSTRAINT FK_332CA4DDD60322AC FOREIGN KEY (role_id) REFERENCES role (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE role_user ADD CONSTRAINT FK_332CA4DDA76ED395 FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE');
-        $this->addSql('DROP TABLE cache_items');
         $this->addSql('ALTER TABLE batch DROP user, DROP role, DROP event');
         $this->addSql('ALTER TABLE booking DROP user');
         $this->addSql('ALTER TABLE user DROP batch, DROP role, DROP event');
@@ -41,7 +40,6 @@ final class Version20191115174034 extends AbstractMigration
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
         $this->addSql('ALTER TABLE role_user DROP FOREIGN KEY FK_332CA4DDD60322AC');
-        $this->addSql('CREATE TABLE cache_items (item_id VARBINARY(255) NOT NULL, item_data MEDIUMBLOB NOT NULL, item_lifetime INT UNSIGNED DEFAULT NULL, item_time INT UNSIGNED NOT NULL, PRIMARY KEY(item_id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB COMMENT = \'\' ');
         $this->addSql('DROP TABLE batch_booking');
         $this->addSql('DROP TABLE user_batch');
         $this->addSql('DROP TABLE user_booking');

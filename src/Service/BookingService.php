@@ -175,4 +175,25 @@ class BookingService
 
         return $booking;
     }
+
+    /**
+     * @param Booking $booking
+     */
+    public function setUsers(Booking $booking)
+    {
+
+        if ($booking->getUsersJSON()) {
+            $usersFromJSON = json_decode($booking->getUsersJSON(), true);
+            foreach ($usersFromJSON as $item) {
+                $usersIds[] = $item['id'];
+            }
+            $users = [];
+
+            if (!empty($usersIds)) {
+                $users = $this->userRepository->findBy(['id' => $usersIds]);
+            }
+            $usersCollection = new ArrayCollection($users);
+            $booking->updateUsers($usersCollection);
+        }
+    }
 }

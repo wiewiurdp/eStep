@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Controller;
 
+use App\Entity\Batch;
 use App\Repository\BatchRepository;
 use App\Repository\UserRepository;
 use App\Service\BookingService;
@@ -11,7 +12,6 @@ use App\Service\GoogleCalendarService;
 use App\Entity\Booking;
 use App\Form\BookingType;
 use App\Repository\BookingRepository;
-use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,6 +36,9 @@ class BookingController extends AbstractController
      */
     private $userRepository;
 
+    /**
+     * @var Batch[]
+     */
     private $batches;
 
     /**
@@ -110,7 +113,7 @@ class BookingController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->setUsers($booking);
+            $this->bookingService->setUsers($booking);
             $event = $this->googleCalendarService->addEvent($booking);
 
             if ($event->getRecurrence()) {
@@ -149,7 +152,7 @@ class BookingController extends AbstractController
         $form = $this->createForm(BookingType::class, $booking);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->setUsers($booking);
+            $this->bookingService->setUsers($booking);
             $this->googleCalendarService->editEvent($booking);
             $this->getDoctrine()->getManager()->flush();
             return $this->redirectToRoute('booking_index');
@@ -174,26 +177,5 @@ class BookingController extends AbstractController
         }
 
         return $this->redirectToRoute('booking_calendar');
-    }
-
-    /**
-     * @param Booking $booking
-     */
-    private function setUsers(Booking $booking)
-    {
-
-        if ($booking->getUsersJSON()) {
-            $usersFromJSON = json_decode($booking->getUsersJSON(), true);
-            foreach ($usersFromJSON as $item) {
-                $usersIds[] = $item['id'];
-            }
-            $users = [];
-
-            if (!empty($usersIds)) {
-                $users = $this->userRepository->findBy(['id' => $usersIds]);
-            }
-            $usersCollection = new ArrayCollection($users);
-            $booking->updateUsers($usersCollection);
-        }
     }
 }

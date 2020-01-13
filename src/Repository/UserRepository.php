@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Role;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -34,6 +35,33 @@ class UserRepository extends ServiceEntityRepository
             ->leftJoin('users.roles', 'users_roles')
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @param integer $batchId
+     *
+     * @return array
+     */
+    public function getUsersAndRoleByBatchId($batchId): array
+    {
+        $usersObjects = $this->getUsersByBatchId($batchId);
+        $usersAndRole = [];
+        /** @var User $userObject */
+        foreach ($usersObjects as $key => $userObject) {
+            $usersAndRole[$key]['id'] = $userObject->getId();
+            $usersAndRole[$key]['name'] = sprintf('%s %s', $userObject->getName(), $userObject->getSurname());
+            /** @var Role $role */
+            $usersAndRole[$key]['role'] = null;
+            foreach ($userObject->getRoles() as $role) {
+                if ($role->getBatch()->getId() === $batchId) {
+                    $usersAndRole[$key]['role'] = $role->getName();
+                }
+            }
+        }
+        $keys = array_column($usersAndRole, 'role');
+        array_multisort($keys, SORT_DESC, $usersAndRole);
+
+        return $usersAndRole;
     }
     /*
     {
