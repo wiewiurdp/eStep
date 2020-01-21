@@ -4,6 +4,9 @@ declare(strict_types = 1);
 
 namespace App\Controller;
 
+use App\Entity\Batch;
+use App\Repository\BatchRepository;
+use App\Repository\UserRepository;
 use App\Service\BookingService;
 use App\Service\GoogleCalendarService;
 use App\Entity\Booking;
@@ -24,22 +27,42 @@ class BookingController extends AbstractController
      * @var BookingService
      */
     private $bookingService;
+    /**
+     * @var BatchRepository
+     */
+    private $batchRepository;
+    /**
+     * @var UserRepository
+     */
+    private $userRepository;
 
     /**
+     * @var Batch[]
+     */
+    private $batches;
+
+    /**
+     * BookingController constructor.
+     *
      * @param GoogleCalendarService $googleCalendarService
      * @param BookingService        $bookingService
+     * @param BatchRepository       $batchRepository
+     * @param UserRepository        $userRepository
      */
-    public function __construct(GoogleCalendarService $googleCalendarService, BookingService $bookingService)
+    public function __construct(GoogleCalendarService $googleCalendarService, BookingService $bookingService, BatchRepository $batchRepository, UserRepository $userRepository)
     {
 
         $this->googleCalendarService = $googleCalendarService;
         $this->bookingService = $bookingService;
+        $this->batchRepository = $batchRepository;
+        $this->userRepository = $userRepository;
+        $this->batches = $this->batchRepository->findAll();
     }
 
     /**
      * @Route("/calendar", name="booking_calendar", methods={"GET"})
      */
-    public function calendar(BookingRepository $bookingRepository): Response
+    public function calendar(): Response
     {
         $client = $this->googleCalendarService->getClient();
 
@@ -86,11 +109,11 @@ class BookingController extends AbstractController
         $today = new \DateTime('today');
         $booking->setStart($today);
         $booking->setEnd($today);
-
         $form = $this->createForm(BookingType::class, $booking);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->bookingService->setUsers($booking);
             $event = $this->googleCalendarService->addEvent($booking);
 
             if ($event->getRecurrence()) {
@@ -104,6 +127,7 @@ class BookingController extends AbstractController
         }
 
         return $this->render('booking/new.html.twig', [
+            'batches' => $this->batches,
             'booking' => $booking,
             'form' => $form->createView(),
         ]);
@@ -127,15 +151,14 @@ class BookingController extends AbstractController
     {
         $form = $this->createForm(BookingType::class, $booking);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->bookingService->setUsers($booking);
             $this->googleCalendarService->editEvent($booking);
             $this->getDoctrine()->getManager()->flush();
-
-            return $this->redirectToRoute('booking_calendar');
+            return $this->redirectToRoute('booking_index');
         }
-
         return $this->render('booking/edit.html.twig', [
+            'batches' => $this->batches,
             'booking' => $booking,
             'form' => $form->createView(),
         ]);

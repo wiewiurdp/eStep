@@ -31,7 +31,7 @@ class AddfieldToDisabledInEditViewSubscriber implements EventSubscriberInterface
         if (!$data || !$data->getId()) {
             $form->add('recurrence', ChoiceType::class, [
                 'attr' => [
-                    'class' => 'test_rec',
+                    'class' => 'reccurence',
                 ],
                 'choices' => [
                     'brak' => null,
@@ -43,11 +43,10 @@ class AddfieldToDisabledInEditViewSubscriber implements EventSubscriberInterface
                 ->add('recurrenceFinishedOn',
                     DateTimeType::class,
                     [
-                        'disabled' => true,
                         'required' => false,
                         'widget' => 'single_text',
                         'attr' => [
-                            'class' => 'test_fin',
+                            'class' => 'recurrenceFinishedOn',
                         ],
                     ]
                 );

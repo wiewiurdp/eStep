@@ -1,4 +1,18 @@
 {{ form_start(form) }}
     {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+<label for="batches">Groups</label>
+<select id="batches" name="batches">
+    <option value=null selected="selected">brak</option>
+    {% for batch in batches %}
+        <option value="{{ batch.id }}">{{ batch.name }}</option>
+    {% endfor %}
+</select>
+<div style="width:500px;margin:40px">
+    <div id="list"></div>
+    <div class="buttons">
+        <button type="button" class="btn btn-sm btn-block btn-info" id="button">selected</button>
+    </div>
+</div>
+<button class="btn">{{ button_label|default('Save') }}</button>
 {{ form_end(form) }}
+

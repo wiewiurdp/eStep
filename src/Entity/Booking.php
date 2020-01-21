@@ -2,11 +2,15 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\BookingRepository")
+ * @UniqueEntity("googleId")
  * @ORM\HasLifecycleCallbacks()
  */
 class Booking
@@ -69,6 +73,46 @@ class Booking
      * @ORM\Column(type="datetime")
      */
     private $modifiedAt;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="bookings")
+     */
+    private $users;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Batch", mappedBy="bookings")
+     */
+    private $batches;
+
+    /**
+     * @var string
+     */
+    private $usersJSON;
+
+    /**
+     */
+    public function __construct()
+    {
+        $this->users = new ArrayCollection();
+        $this->batches = new ArrayCollection();
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getUsersJSON(): ?string
+    {
+        return $this->usersJSON;
+    }
+
+    /**
+     * @param $usersJSON
+     */
+    public function setUsersJSON($usersJSON): void
+    {
+        $this->usersJSON = $usersJSON;
+    }
+
 
     /**
      * @return \DateTimeInterface
@@ -265,5 +309,104 @@ class Booking
     public function setModifiedAtValue(): void
     {
         $this->modifiedAt = new \DateTime();
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    /**
+     * @param ArrayCollection $users
+     */
+    public function updateUsers(ArrayCollection $users): void
+    {
+        foreach ($this->users->getValues() as $value) {
+            if (!$users->contains($value)) {
+                $this->removeUser($value);
+            }
+        }
+        foreach ($users as $user) {
+            $this->addUser($user);
+        }
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return $this
+     */
+    public function addUser(User $user): self
+    {
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
+            $user->addBooking($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return $this
+     */
+    public function removeUser(User $user): self
+    {
+        if ($this->users->contains($user)) {
+            $this->users->removeElement($user);
+            $user->removeBooking($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Batch[]
+     */
+    public function getBatches(): Collection
+    {
+        return $this->batches;
+    }
+
+    /**
+     * @param Batch $batch
+     *
+     * @return $this
+     */
+    public function addBatch(Batch $batch): self
+    {
+        if (!$this->batches->contains($batch)) {
+            $this->batches[] = $batch;
+            $batch->addBooking($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Batch $batch
+     *
+     * @return $this
+     */
+    public function removeBatch(Batch $batch): self
+    {
+        if ($this->batches->contains($batch)) {
+            $this->batches->removeElement($batch);
+            $batch->removeBooking($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function __toString()
+    {
+        return $this->summary;
     }
 }

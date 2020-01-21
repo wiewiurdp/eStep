@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\Service;
 
 use App\Entity\Booking;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
@@ -94,6 +95,7 @@ class GoogleCalendarService
                 if ($this->redirectUri) {
                     $this->client->setRedirectUri($this->redirectUri);
                 }
+
                 if ($authCode !== null) {
                     $this->accessToken->set($this->client->fetchAccessTokenWithAuthCode($authCode));
                     $this->cache->save($this->accessToken);
@@ -177,11 +179,13 @@ class GoogleCalendarService
                 "timeZone" => "Europe/Warsaw",
             ],
         ]);
+        $this->setAttendees($booking, $event);
 
         if ($booking->getRecurrence() && $booking->getRecurrenceFinishedOn()) {
             $event->setRecurrence([sprintf('RRULE:FREQ=%s;UNTIL=%d', $booking->getRecurrence(), $booking->getRecurrenceFinishedOn()->format('Ymd'))]);
         }
-        return $this->getService()->events->insert(self::CALENDAR_ID, $event, ['sendNotifications' => true]);
+
+        return $this->getService()->events->insert(self::CALENDAR_ID, $event, ['sendUpdates' => 'all']);
     }
 
     /**
@@ -220,7 +224,8 @@ class GoogleCalendarService
                 'dateTime' => $booking->getEnd()->format('Y-m-d\TH:i:sP'),
             ],
         ]);
-        $this->getService()->events->update(self::CALENDAR_ID, $booking->getGoogleId(), $event);
+        $this->setAttendees($booking, $event);
+        $this->getService()->events->update(self::CALENDAR_ID, $booking->getGoogleId(), $event, ['sendUpdates' => 'all']);
     }
 
     /**
@@ -239,6 +244,7 @@ class GoogleCalendarService
         if (!$this->service) {
             $this->getClient();
         }
+
         return $this->service;
     }
 
@@ -248,5 +254,28 @@ class GoogleCalendarService
     public function setService($service): void
     {
         $this->service = $service;
+    }
+
+    /**
+     * @param Booking                        $booking
+     * @param \Google_Service_Calendar_Event $event
+     *
+     * @return \Google_Service_Calendar_Event
+     */
+    private function setAttendees(Booking $booking, \Google_Service_Calendar_Event $event): \Google_Service_Calendar_Event
+    {
+        if ($booking->getUsers()) {
+            $attendees = [];
+            /** @var User $user */
+            foreach ($booking->getUsers() as $user) {
+                $attendee = new \Google_Service_Calendar_EventAttendee();
+                $attendee->setEmail($user->getMail());
+                $attendee->setDisplayName(sprintf('%s %s', $user->getName(), $user->getSurname()));
+                $attendees[] = $attendee;
+            }
+            $event->setAttendees($attendees);
+        }
+
+        return $event;
     }
 }

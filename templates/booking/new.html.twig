@@ -2,6 +2,11 @@
 
 {% block title %}New Booking{% endblock %}
 
+   {% block stylesheets %}
+       {{ parent() }}
+       <link rel="stylesheet" href="{{ asset('css/picklist.css') }}">
+   {% endblock %}
+
 {% block body %}
     <h1>Create new Booking</h1>
 
@@ -9,20 +14,17 @@
 
     <a href="{{ path('booking_index') }}">back to list</a>
 
-
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
     <script>
-        var $rec = $('.test_rec'), $fin = $('.test_fin');
-        $rec.change(function () {
-            if ($rec.val() !== '0') {
-                $fin.removeAttr('disabled');
-            } else {
-                $fin.prop('disabled', true);
-            }
-        }); // added trigger to calculate initial state
+        var data = {
+            available: [],
+            selected: []
+        };
     </script>
+    <script src="{{ asset('js/picklist.js') }}"></script>
+    <script src="{{ asset('js/booking.js') }}"></script>
 {% endblock %}
 

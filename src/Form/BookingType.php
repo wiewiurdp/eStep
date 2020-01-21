@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Booking;
 use App\Form\EventListener\AddfieldToDisabledInEditViewSubscriber;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -32,7 +33,8 @@ class BookingType extends AbstractType
                 ]
             )
             ->add('description')
-            ->add('location');
+            ->add('location')
+            ->add('usersJSON', HiddenType::class);
 
         $builder->addEventSubscriber(new AddfieldToDisabledInEditViewSubscriber());
     }
