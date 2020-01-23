@@ -13,6 +13,11 @@
     {% endblock %}
 </head>
 <body>
+{% if app.user %}
+    <div class="mb-3">
+        You are logged in as {{ app.user.username }}, <a href="{{ path('app_logout') }}">Logout</a><br><br>
+    </div>
+{% endif %}
 {% block body %}{% endblock %}
 {% block javascripts %}
     <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.min.js"></script>
