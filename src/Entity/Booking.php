@@ -84,6 +84,9 @@ class Booking
      */
     private $batches;
 
+    /**
+     * @var string
+     */
     private $attendeesJSON;
 
     /**

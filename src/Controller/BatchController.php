@@ -70,7 +70,9 @@ class BatchController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($batch);
+            $entityManager->flush();
 
             return $this->redirectToRoute('batch_index');
         }

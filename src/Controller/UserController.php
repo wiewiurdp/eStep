@@ -55,6 +55,7 @@ class UserController extends AbstractController
 
             return $this->redirectToRoute('user_index');
         }
+
         return $this->render('user/new.html.twig', [
             'user' => $user,
             'form' => $form->createView(),
@@ -103,5 +104,18 @@ class UserController extends AbstractController
         }
 
         return $this->redirectToRoute('user_index');
+    }
+
+    /**
+     * @Route("/getUsersByBatch/{batchId}", name="get_users_by_batch", methods={"GET"}, options={"expose"=true})
+     */
+    public function getUsersByBatch(Request $request, int $batchId): JsonResponse
+    {
+        if ($request->isXmlHttpRequest()) {
+            $usersAndRole = json_encode($this->userRepository->getUsersAndRoleByBatchId($batchId));
+            return new JsonResponse($usersAndRole, 200, [], true);
+        }
+
+        return new JsonResponse('This function is only available in AJAX');
     }
 }
