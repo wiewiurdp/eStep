@@ -10,7 +10,7 @@
             <tr>
                 <th>Id</th>
                 <th>Name</th>
-                <th>Users</th>
+                <th>Attendees</th>
                 <th>Roles</th>
                 <th>Bookings</th>
                 <th>actions</th>
@@ -22,8 +22,8 @@
                 <td>{{ batch.id }}</td>
                 <td>{{ batch.name }}</td>
                 <td>
-                    {% for user in batch.users %}
-                        {{ user.name }} {{ user.surname }} |
+                    {% for attendee in batch.attendees %}
+                        {{ attendee.name }} {{ attendee.surname }} |
                     {% endfor %}
                 </td>
                 <td>

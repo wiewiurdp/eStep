@@ -16,7 +16,7 @@ class Batch
      */
     public function __construct()
     {
-        $this->users = new ArrayCollection();
+        $this->attendees = new ArrayCollection();
         $this->roles = new ArrayCollection();
         $this->bookings = new ArrayCollection();
     }
@@ -39,9 +39,9 @@ class Batch
     private $roles;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="batches")
+     * @ORM\ManyToMany(targetEntity="Attendee", mappedBy="batches")
      */
-    private $users;
+    private $attendees;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Booking", inversedBy="batches")
@@ -118,38 +118,38 @@ class Batch
     }
 
     /**
-     * @return Collection|User[]
+     * @return Collection|Attendee[]
      */
-    public function getUsers(): Collection
+    public function getAttendees(): Collection
     {
-        return $this->users;
+        return $this->attendees;
     }
 
     /**
-     * @param User $user
+     * @param Attendee $attendee
      *
      * @return $this
      */
-    public function addUser(User $user): self
+    public function addAttendee(Attendee $attendee): self
     {
-        if (!$this->users->contains($user)) {
-            $this->users[] = $user;
-            $user->addBatch($this);
+        if (!$this->attendees->contains($attendee)) {
+            $this->attendees[] = $attendee;
+            $attendee->addBatch($this);
         }
 
         return $this;
     }
 
     /**
-     * @param User $user
+     * @param Attendee $attendee
      *
      * @return $this
      */
-    public function removeUser(User $user): self
+    public function removeAttendee(Attendee $attendee): self
     {
-        if ($this->users->contains($user)) {
-            $this->users->removeElement($user);
-            $user->removeBatch($this);
+        if ($this->attendees->contains($attendee)) {
+            $this->attendees->removeElement($attendee);
+            $attendee->removeBatch($this);
         }
 
         return $this;

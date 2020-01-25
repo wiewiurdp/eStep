@@ -75,9 +75,9 @@ class Booking
     private $modifiedAt;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="bookings")
+     * @ORM\ManyToMany(targetEntity="Attendee", mappedBy="bookings")
      */
-    private $users;
+    private $attendees;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Batch", mappedBy="bookings")
@@ -87,30 +87,30 @@ class Booking
     /**
      * @var string
      */
-    private $usersJSON;
+    private $attendeesJSON;
 
     /**
      */
     public function __construct()
     {
-        $this->users = new ArrayCollection();
+        $this->attendees = new ArrayCollection();
         $this->batches = new ArrayCollection();
     }
 
     /**
      * @return string|null
      */
-    public function getUsersJSON(): ?string
+    public function getAttendeesJSON(): ?string
     {
-        return $this->usersJSON;
+        return $this->attendeesJSON;
     }
 
     /**
-     * @param $usersJSON
+     * @param $attendeesJSON
      */
-    public function setUsersJSON($usersJSON): void
+    public function setAttendeesJSON($attendeesJSON): void
     {
-        $this->usersJSON = $usersJSON;
+        $this->attendeesJSON = $attendeesJSON;
     }
 
 
@@ -312,53 +312,53 @@ class Booking
     }
 
     /**
-     * @return Collection|User[]
+     * @return Collection|Attendee[]
      */
-    public function getUsers(): Collection
+    public function getAttendees(): Collection
     {
-        return $this->users;
+        return $this->attendees;
     }
 
     /**
-     * @param ArrayCollection $users
+     * @param ArrayCollection $attendees
      */
-    public function updateUsers(ArrayCollection $users): void
+    public function updateAttendees(ArrayCollection $attendees): void
     {
-        foreach ($this->users->getValues() as $value) {
-            if (!$users->contains($value)) {
-                $this->removeUser($value);
+        foreach ($this->attendees->getValues() as $value) {
+            if (!$attendees->contains($value)) {
+                $this->removeAttendee($value);
             }
         }
-        foreach ($users as $user) {
-            $this->addUser($user);
+        foreach ($attendees as $attendee) {
+            $this->addAttendee($attendee);
         }
     }
 
     /**
-     * @param User $user
+     * @param Attendee $attendee
      *
      * @return $this
      */
-    public function addUser(User $user): self
+    public function addAttendee(Attendee $attendee): self
     {
-        if (!$this->users->contains($user)) {
-            $this->users[] = $user;
-            $user->addBooking($this);
+        if (!$this->attendees->contains($attendee)) {
+            $this->attendees[] = $attendee;
+            $attendee->addBooking($this);
         }
 
         return $this;
     }
 
     /**
-     * @param User $user
+     * @param Attendee $attendee
      *
      * @return $this
      */
-    public function removeUser(User $user): self
+    public function removeAttendee(Attendee $attendee): self
     {
-        if ($this->users->contains($user)) {
-            $this->users->removeElement($user);
-            $user->removeBooking($this);
+        if ($this->attendees->contains($attendee)) {
+            $this->attendees->removeElement($attendee);
+            $attendee->removeBooking($this);
         }
 
         return $this;

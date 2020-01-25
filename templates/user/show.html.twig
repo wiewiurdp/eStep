@@ -7,44 +7,26 @@
 
     <table class="table">
         <tbody>
-        <tr>
-            <th>Id</th>
-            <td>{{ user.id }}</td>
-        </tr>
-        <tr>
-            <th>Name</th>
-            <td>{{ user.name }}</td>
-        </tr>
-        <tr>
-            <th>Surname</th>
-            <td>{{ user.surname }}</td>
-        </tr>
-        <tr>
-            <th>Mail</th>
-            <td>{{ user.mail }}</td>
-        </tr>
-        <tr>
-            <th>Address</th>
-            <td>{{ user.address }}</td>
-        </tr>
-        <tr>
-            <th>Batches</th>
-            {% for batch in user.batches %}
-                <td>{{ batch.name }}</td>
-            {% endfor %}
-        </tr>
-        <tr>
-            <th>Roles</th>
-            {% for role in user.roles %}
-                <td>{{ role.name }}</td>
-            {% endfor %}
-        </tr>
-        <tr>
-            <th>Booings</th>
-            {% for booking in user.bookings %}
-                <td>{{ booking.summary }}</td>
-            {% endfor %}
-        </tr>
+            <tr>
+                <th>Id</th>
+                <td>{{ user.id }}</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>{{ user.email }}</td>
+            </tr>
+            <tr>
+                <th>Roles</th>
+                <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
+            </tr>
+            <tr>
+                <th>Password</th>
+                <td>{{ user.password }}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>{{ user.name }}</td>
+            </tr>
         </tbody>
     </table>
 

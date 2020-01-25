@@ -32,9 +32,9 @@
             <td>{{ booking.recurrence }}</td>
         </tr>
         <tr>
-            <th>Users</th>
-            {% for user in booking.users %}
-            <td>{{user.name}} {{user.surname}}</td>
+            <th>Attendees</th>
+            {% for attendee in booking.attendees %}
+            <td>{{attendee.name}} {{attendee.surname}}</td>
             {% endfor %}
         </tr>
 

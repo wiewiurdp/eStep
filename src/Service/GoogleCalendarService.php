@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace App\Service;
 
 use App\Entity\Booking;
-use App\Entity\User;
+use App\Entity\Attendee;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
@@ -91,7 +91,7 @@ class GoogleCalendarService
             $this->client->setIncludeGrantedScopes(true);
 //         getting access token
             if (!$this->accessToken->isHit()) {
-                // Request authorization from the user.
+                // Request authorization from the attendee.
                 if ($this->redirectUri) {
                     $this->client->setRedirectUri($this->redirectUri);
                 }
@@ -264,14 +264,14 @@ class GoogleCalendarService
      */
     private function setAttendees(Booking $booking, \Google_Service_Calendar_Event $event): \Google_Service_Calendar_Event
     {
-        if ($booking->getUsers()) {
+        if ($booking->getAttendees()) {
             $attendees = [];
-            /** @var User $user */
-            foreach ($booking->getUsers() as $user) {
-                $attendee = new \Google_Service_Calendar_EventAttendee();
-                $attendee->setEmail($user->getMail());
-                $attendee->setDisplayName(sprintf('%s %s', $user->getName(), $user->getSurname()));
-                $attendees[] = $attendee;
+            /** @var Attendee $attendee */
+            foreach ($booking->getAttendees() as $attendee) {
+                $googleAttendee = new \Google_Service_Calendar_EventAttendee();
+                $googleAttendee->setEmail($attendee->getMail());
+                $googleAttendee->setDisplayName(sprintf('%s %s', $attendee->getName(), $attendee->getSurname()));
+                $attendees[] = $googleAttendee;
             }
             $event->setAttendees($attendees);
         }

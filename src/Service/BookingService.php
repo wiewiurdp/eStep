@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace App\Service;
 
 use App\Entity\Booking;
-use App\Repository\UserRepository;
+use App\Repository\AttendeeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -16,18 +16,18 @@ class BookingService
      */
     private $entityManager;
     /**
-     * @var UserRepository
+     * @var AttendeeRepository
      */
-    private $userRepository;
+    private $attendeeRepository;
 
     /**
      * @param EntityManagerInterface $entityManager
-     * @param UserRepository         $userRepository
+     * @param AttendeeRepository     $attendeeRepository
      */
-    public function __construct(EntityManagerInterface $entityManager, UserRepository $userRepository)
+    public function __construct(EntityManagerInterface $entityManager, AttendeeRepository $attendeeRepository)
     {
         $this->entityManager = $entityManager;
-        $this->userRepository = $userRepository;
+        $this->attendeeRepository = $attendeeRepository;
     }
 
     /**
@@ -153,24 +153,24 @@ class BookingService
     private function updateAttendees(\Google_Service_Calendar_Event $event, Booking $booking): Booking
     {
         $attendeesEmails = null;
-        $users = [];
+        $attendees = [];
         foreach ($event->getAttendees() as $attendee) {
             $attendeesEmails[] = $attendee->getEmail();
         }
 
         if ($attendeesEmails) {
-            $users = $this->userRepository->findBy(['mail' => $attendeesEmails]);
+            $attendees = $this->attendeeRepository->findBy(['mail' => $attendeesEmails]);
         }
-        $usersCollection = new ArrayCollection($users);
+        $attendeesCollection = new ArrayCollection($attendees);
 
-        foreach ($booking->getUsers()->getValues() as $value) {
+        foreach ($booking->getAttendees()->getValues() as $value) {
 
-            if (!$usersCollection->contains($value)) {
-                $booking->removeUser($value);
+            if (!$attendeesCollection->contains($value)) {
+                $booking->removeAttendee($value);
             }
         }
-        foreach ($usersCollection as $user) {
-            $booking->addUser($user);
+        foreach ($attendeesCollection as $attendee) {
+            $booking->addAttendee($attendee);
         }
 
         return $booking;

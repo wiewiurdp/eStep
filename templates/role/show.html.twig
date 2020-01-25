@@ -20,9 +20,9 @@
                 <td>{{ role.batch }}</td>
             </tr>
             <tr>
-                <th>Users</th>
-                {% for user in role.users %}
-                    <td>{{ user.name }} {{ user.surname }} |</td>
+                <th>Attendees</th>
+                {% for attendee in role.attendees %}
+                    <td>{{ attendee.name }} {{ attendee.surname }} |</td>
                 {% endfor %}
             </tr>
         </tbody>

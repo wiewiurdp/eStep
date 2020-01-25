@@ -11,7 +11,7 @@
             <th>Id</th>
             <th>Name</th>
             <th>Batches</th>
-            <th>Users</th>
+            <th>Attendees</th>
             <th>actions</th>
         </tr>
         </thead>
@@ -22,8 +22,8 @@
                 <td>{{ role.name }}</td>
                 <td>{{ role.batch }}</td>
                 <td>
-                    {% for user in role.users %}
-                        {{ user.name }} {{ user.surname }} |
+                    {% for attendee in role.attendees %}
+                        {{ attendee.name }} {{ attendee.surname }} |
                     {% endfor %}
                 </td>
                 <td>

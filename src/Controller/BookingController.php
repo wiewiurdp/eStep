@@ -6,7 +6,7 @@ namespace App\Controller;
 
 use App\Entity\Batch;
 use App\Repository\BatchRepository;
-use App\Repository\UserRepository;
+use App\Repository\AttendeeRepository;
 use App\Service\BookingService;
 use App\Service\GoogleCalendarService;
 use App\Entity\Booking;
@@ -16,8 +16,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
+ * @IsGranted("ROLE_USER")
+ *
  * @Route("/booking")
  */
 class BookingController extends AbstractController
@@ -32,9 +35,9 @@ class BookingController extends AbstractController
      */
     private $batchRepository;
     /**
-     * @var UserRepository
+     * @var AttendeeRepository
      */
-    private $userRepository;
+    private $attendeeRepository;
 
     /**
      * @var Batch[]
@@ -47,15 +50,15 @@ class BookingController extends AbstractController
      * @param GoogleCalendarService $googleCalendarService
      * @param BookingService        $bookingService
      * @param BatchRepository       $batchRepository
-     * @param UserRepository        $userRepository
+     * @param AttendeeRepository    $attendeeRepository
      */
-    public function __construct(GoogleCalendarService $googleCalendarService, BookingService $bookingService, BatchRepository $batchRepository, UserRepository $userRepository)
+    public function __construct(GoogleCalendarService $googleCalendarService, BookingService $bookingService, BatchRepository $batchRepository, AttendeeRepository $attendeeRepository)
     {
 
         $this->googleCalendarService = $googleCalendarService;
         $this->bookingService = $bookingService;
         $this->batchRepository = $batchRepository;
-        $this->userRepository = $userRepository;
+        $this->attendeeRepository = $attendeeRepository;
         $this->batches = $this->batchRepository->findAll();
     }
 
