@@ -23,11 +23,32 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
 {
     use TargetPathTrait;
 
-    private $entityManager;
-    private $urlGenerator;
-    private $csrfTokenManager;
-    private $passwordEncoder;
+    /**
+     * @var EntityManagerInterface
+     */
+    private EntityManagerInterface $entityManager;
 
+    /**
+     * @var UrlGeneratorInterface
+     */
+    private UrlGeneratorInterface $urlGenerator;
+
+    /**
+     * @var CsrfTokenManagerInterface
+     */
+    private CsrfTokenManagerInterface $csrfTokenManager;
+
+    /**
+     * @var UserPasswordEncoderInterface
+     */
+    private UserPasswordEncoderInterface $passwordEncoder;
+
+    /**
+     * @param EntityManagerInterface       $entityManager
+     * @param UrlGeneratorInterface        $urlGenerator
+     * @param CsrfTokenManagerInterface    $csrfTokenManager
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     */
     public function __construct(EntityManagerInterface $entityManager, UrlGeneratorInterface $urlGenerator, CsrfTokenManagerInterface $csrfTokenManager, UserPasswordEncoderInterface $passwordEncoder)
     {
         $this->entityManager = $entityManager;
@@ -85,8 +106,9 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
             return new RedirectResponse($targetPath);
         }
 
-     return new RedirectResponse($this->urlGenerator->generate('booking_calendar'));
+        return new RedirectResponse($this->urlGenerator->generate('booking_calendar'));
     }
+
 
     protected function getLoginUrl()
     {

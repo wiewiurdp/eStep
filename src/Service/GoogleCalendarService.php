@@ -209,6 +209,16 @@ class GoogleCalendarService
     }
 
     /**
+     * @param $googleId
+     *
+     * @return \Google_Service_Calendar_Event
+     */
+    public function getEvent($googleId)
+    {
+        return $this->getService()->events->get(self::CALENDAR_ID, $googleId);
+    }
+
+    /**
      * @param Booking $booking
      */
     public function editEvent(Booking $booking): void

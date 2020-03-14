@@ -53,9 +53,14 @@ class Attendee
     private $batches;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Booking", inversedBy="attendees")
+     * @ORM\ManyToMany(targetEntity="App\Entity\Booking", inversedBy="attendees", cascade={"persist"})
      */
     private $bookings;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Presence", mappedBy="attendee")
+     */
+    private $presences;
 
     /**
      * Attendee constructor.
@@ -65,6 +70,7 @@ class Attendee
         $this->roles = new ArrayCollection();
         $this->batches = new ArrayCollection();
         $this->bookings = new ArrayCollection();
+        $this->presences = new ArrayCollection();
     }
 
     /**
@@ -271,5 +277,42 @@ class Attendee
     public function __toString()
     {
         return sprintf('%s %s', $this->name, $this->surname);
+    }
+
+
+    /**
+     * @return Collection|Presence[]
+     */
+    public function getPresences(): Collection
+    {
+        return $this->presences;
+    }
+
+    /**
+     * @param Presence $presence
+     *
+     * @return $this
+     */
+    public function addPresence(Presence $presence): self
+    {
+        if (!$this->presences->contains($presence)) {
+            $this->presences[] = $presence;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Presence $presence
+     *
+     * @return $this
+     */
+    public function removePresence(Presence $presence): self
+    {
+        if ($this->presences->contains($presence)) {
+            $this->presences->removeElement($presence);
+        }
+
+        return $this;
     }
 }
