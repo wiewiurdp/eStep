@@ -5,19 +5,18 @@ declare(strict_types = 1);
 namespace App\Controller;
 
 use App\Entity\Batch;
-use App\Repository\BatchRepository;
-use App\Repository\AttendeeRepository;
-use App\Service\BookingService;
-use App\Service\GoogleCalendarService;
 use App\Entity\Booking;
 use App\Form\BookingType;
+use App\Repository\BatchRepository;
 use App\Repository\BookingRepository;
+use App\Service\BookingService;
+use App\Service\GoogleCalendarService;
 use App\Service\PresenceService;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
  * @IsGranted("ROLE_USER")
@@ -49,8 +48,6 @@ class BookingController extends AbstractController
     private $batches;
 
     /**
-     * BookingController constructor.
-     *
      * @param GoogleCalendarService $googleCalendarService
      * @param BookingService        $bookingService
      * @param BatchRepository       $batchRepository

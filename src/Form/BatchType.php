@@ -18,8 +18,6 @@ class BatchType extends AbstractType
         $builder
             ->add('name')
             ->add('attendees')
-            ->add('roles')
-            ->add('bookings')
         ;
     }
 

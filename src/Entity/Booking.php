@@ -80,11 +80,6 @@ class Booking
     private $attendees;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Batch", mappedBy="bookings")
-     */
-    private $batches;
-
-    /**
      * @var string
      */
     private $attendeesJSON;
@@ -99,7 +94,6 @@ class Booking
     public function __construct()
     {
         $this->attendees = new ArrayCollection();
-        $this->batches = new ArrayCollection();
         $this->presences = new ArrayCollection();
     }
 
@@ -365,44 +359,6 @@ class Booking
         if ($this->attendees->contains($attendee)) {
             $this->attendees->removeElement($attendee);
             $attendee->removeBooking($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Batch[]
-     */
-    public function getBatches(): Collection
-    {
-        return $this->batches;
-    }
-
-    /**
-     * @param Batch $batch
-     *
-     * @return $this
-     */
-    public function addBatch(Batch $batch): self
-    {
-        if (!$this->batches->contains($batch)) {
-            $this->batches[] = $batch;
-            $batch->addBooking($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param Batch $batch
-     *
-     * @return $this
-     */
-    public function removeBatch(Batch $batch): self
-    {
-        if ($this->batches->contains($batch)) {
-            $this->batches->removeElement($batch);
-            $batch->removeBooking($this);
         }
 
         return $this;

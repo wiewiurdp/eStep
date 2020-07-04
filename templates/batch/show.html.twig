@@ -8,10 +8,6 @@
     <table class="table">
         <tbody>
         <tr>
-            <th>Id</th>
-            <td>{{ batch.id }}</td>
-        </tr>
-        <tr>
             <th>Name</th>
             <td>{{ batch.name }}</td>
         </tr>
@@ -25,12 +21,6 @@
             <th>Roles</th>
             {% for role in batch.roles %}
                 <td>{{ role.name }}</td>
-            {% endfor %}
-        </tr>
-        <tr>
-            <th>Bookings</th>
-            {% for booking in batch.bookings %}
-                <td>{{ booking.summary }}</td>
             {% endfor %}
         </tr>
         </tbody>

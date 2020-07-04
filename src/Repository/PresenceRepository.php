@@ -19,22 +19,18 @@ class PresenceRepository extends ServiceEntityRepository
         parent::__construct($registry, Presence::class);
     }
 
-    // /**
-    //  * @return Presence[] Returns an array of Presence objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @return Presence[] Returns an array of Presence objects
+     */
+    public function findByBooking($bookingId)
     {
         return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
+            ->andWhere('p.booking = :bookingId')
+            ->setParameter('bookingId', $bookingId)
             ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
-    */
 
     /*
     public function findOneBySomeField($value): ?Presence
