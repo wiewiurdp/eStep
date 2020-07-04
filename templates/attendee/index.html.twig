@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Attendee index{% endblock %}
+
+{% block body %}
+    <h1>Attendee index</h1>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Surname</th>
+            <th>Mail</th>
+            <th>Address</th>
+            <th>Batches</th>
+            <th>Roles</th>
+            <th>Bookings</th>
+            <th>actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for attendee in attendees %}
+            <tr>
+                <td>{{ attendee.id }}</td>
+                <td>{{ attendee.name }}</td>
+                <td>{{ attendee.surname }}</td>
+                <td>{{ attendee.mail }}</td>
+                <td>{{ attendee.address }}</td>
+                <td>
+                    {% for batch in attendee.batches %}
+                        {{ batch.name }}
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for role in attendee.roles %}
+                        {{ role.batch.name }} -
+                        {{ role.name }} |
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for booking in attendee.bookings %}
+                        {{ booking.summary }}
+                    {% endfor %}
+                </td>
+                <td>
+                    <a href="{{ path('attendee_show', {'id': attendee.id}) }}">show</a>
+                    <a href="{{ path('attendee_edit', {'id': attendee.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="9">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('attendee_new') }}">Create new</a>
+{% endblock %}

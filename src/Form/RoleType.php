@@ -18,7 +18,7 @@ class RoleType extends AbstractType
         $builder
             ->add('name')
             ->add('batch')
-            ->add('users')
+            ->add('attendees')
         ;
     }
 

@@ -10,7 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-class AddfieldToDisabledInEditViewSubscriber implements EventSubscriberInterface
+class AddFieldToDisabledInEditViewSubscriber implements EventSubscriberInterface
 {
     /**
      * @return array

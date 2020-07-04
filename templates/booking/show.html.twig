@@ -3,39 +3,43 @@
 {% block title %}Booking{% endblock %}
 
 {% block body %}
-    <h1>Booking</h1>
+<h1>Booking</h1>
 
-    <table class="table">
-        <tbody>
-        <tr>
-            <th>Summary</th>
-            <td>{{ booking.summary }}</td>
-        </tr>
-        <tr>
-            <th>Description</th>
-            <td>{{ booking.description }}</td>
-        </tr>
-        <tr>
-            <th>Start</th>
-            <td>{{ booking.start ? booking.start|date('Y-m-d H:i:s') : '' }}</td>
-        </tr>
-        <tr>
-            <th>End</th>
-            <td>{{ booking.end ? booking.end|date('Y-m-d H:i:s') : '' }}</td>
-        </tr>
-        <tr>
-            <th>Location</th>
-            <td>{{ booking.location }}</td>
-        </tr>
-        <tr>
-            <th>Recurrence</th>
-            <td>{{ booking.recurrence }}</td>
-        </tr>
-        <tr>
-            <th>Users</th>
-            {% for user in booking.users %}
-            <td>{{user.name}} {{user.surname}}</td>
-            {% endfor %}
+<table class="table">
+    <tbody>
+    <tr>
+        <th>Summary</th>
+        <td>{{ booking.summary }}</td>
+    </tr>
+    <tr>
+        <th>Description</th>
+        <td>{{ booking.description }}</td>
+    </tr>
+    <tr>
+        <th>Start</th>
+        <td>{{ booking.start ? booking.start|date('Y-m-d H:i:s') : '' }}</td>
+    </tr>
+    <tr>
+        <th>End</th>
+        <td>{{ booking.end ? booking.end|date('Y-m-d H:i:s') : '' }}</td>
+    </tr>
+    <tr>
+        <th>Location</th>
+        <td>{{ booking.location }}</td>
+    </tr>
+    <tr>
+        <th>Recurrence</th>
+        <td>{{ booking.recurrence }}</td>
+    </tr>
+    <tr>
+        <th>Attendees</th>
+        {% for presence in booking.presences %}
+            <td>{{ presence.attendee.name }} {{ presence.attendee.surname }} {{ presence.stated }} </td>
+        {% endfor %}
+    </tr>
+    <tr>
+        <th>Presences</th>
+        <td><a href="{{ path('presence_collection_by_booking', {'bookingId':booking.id })}}">Update</a></td>
         </tr>
 
         </tbody>

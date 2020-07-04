@@ -27,8 +27,8 @@ class RoleRepository extends ServiceEntityRepository
     public function getRolesByBatchId($batchId)
     {
         return $this->createQueryBuilder('roles')
-            ->select('roles.name as name', 'roles_users.id as user_id')
-            ->join('roles.users', 'roles_users')
+            ->select('roles.name as name', 'roles_attendees.id as attendee_id')
+            ->join('roles.attendees', 'roles_attendees')
             ->andWhere('roles.batch = :batchId')
             ->setParameter('batchId', $batchId)
             ->getQuery()

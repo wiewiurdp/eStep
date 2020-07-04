@@ -25,8 +25,8 @@
             available: [],
             selected: []
         };
-        {% for user in booking.users %}
-        data.selected.push({id: '{{ user.id }}', label: '{{ user.name }} ' + '{{ user.surname }}' },);
+        {% for attendee in booking.attendees %}
+        data.selected.push({id: '{{ attendee.id }}', label: '{{ attendee.name }} ' + '{{ attendee.surname }}' },);
         {% endfor %}
     </script>
     <script src="{{ asset('js/picklist.js') }}"></script>

@@ -2,58 +2,40 @@
 
 namespace App\Controller;
 
-use App\Entity\Role;
 use App\Entity\User;
 use App\Form\UserType;
-use App\Repository\BatchRepository;
-use App\Repository\RoleRepository;
 use App\Repository\UserRepository;
-use Psr\Log\LoggerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
+ * @IsGranted("ROLE_USER")
+ *
  * @Route("/user")
  */
 class UserController extends AbstractController
 {
-    /**
-     * @var UserRepository
-     */
-    private $userRepository;
-    /**
-     * @var BatchRepository
-     */
-    private $batchRepository;
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-    /**
-     * @var RoleRepository
-     */
-    private $roleRepository;
+    private $userPasswordEncoder;
 
     /**
-     * UserController constructor.
-     *
-     * @param UserRepository $userRepository
+     * @param UserPasswordEncoderInterface $userPasswordEncoder
      */
-    public function __construct(UserRepository $userRepository)
+    public function __construct(UserPasswordEncoderInterface $userPasswordEncoder)
     {
-        $this->userRepository = $userRepository;
+        $this->userPasswordEncoder = $userPasswordEncoder;
     }
 
     /**
      * @Route("/", name="user_index", methods={"GET"})
      */
-    public function index(): Response
+    public function index(UserRepository $userRepository): Response
     {
         return $this->render('user/index.html.twig', [
-            'users' => $this->userRepository->findAll(),
+            'users' => $userRepository->findAll(),
         ]);
     }
 
@@ -62,7 +44,7 @@ class UserController extends AbstractController
      */
     public function new(Request $request): Response
     {
-        $user = new User();
+        $user = new User($this->userPasswordEncoder);
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 

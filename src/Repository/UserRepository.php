@@ -64,6 +64,7 @@ class UserRepository extends ServiceEntityRepository
         return $usersAndRole;
     }
     /*
+    public function findOneBySomeField($value): ?User
     {
         return $this->createQueryBuilder('u')
             ->andWhere('u.exampleField = :val')

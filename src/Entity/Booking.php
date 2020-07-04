@@ -75,42 +75,42 @@ class Booking
     private $modifiedAt;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="bookings")
+     * @ORM\ManyToMany(targetEntity="Attendee", mappedBy="bookings" ,cascade={"persist"})
      */
-    private $users;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Batch", mappedBy="bookings")
-     */
-    private $batches;
+    private $attendees;
 
     /**
      * @var string
      */
-    private $usersJSON;
+    private $attendeesJSON;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Presence", mappedBy="booking", cascade={"persist", "remove"})
+     */
+    private $presences;
 
     /**
      */
     public function __construct()
     {
-        $this->users = new ArrayCollection();
-        $this->batches = new ArrayCollection();
+        $this->attendees = new ArrayCollection();
+        $this->presences = new ArrayCollection();
     }
 
     /**
      * @return string|null
      */
-    public function getUsersJSON(): ?string
+    public function getAttendeesJSON(): ?string
     {
-        return $this->usersJSON;
+        return $this->attendeesJSON;
     }
 
     /**
-     * @param $usersJSON
+     * @param $attendeesJSON
      */
-    public function setUsersJSON($usersJSON): void
+    public function setAttendeesJSON($attendeesJSON): void
     {
-        $this->usersJSON = $usersJSON;
+        $this->attendeesJSON = $attendeesJSON;
     }
 
 
@@ -283,11 +283,11 @@ class Booking
     }
 
     /**
-     * @param $googleId
+     * @param string $googleId
      *
      * @return $this
      */
-    public function setGoogleId($googleId): self
+    public function setGoogleId(string $googleId): self
     {
         $this->googleId = $googleId;
 
@@ -312,91 +312,53 @@ class Booking
     }
 
     /**
-     * @return Collection|User[]
+     * @return Collection|Attendee[]
      */
-    public function getUsers(): Collection
+    public function getAttendees(): Collection
     {
-        return $this->users;
+        return $this->attendees;
     }
 
     /**
-     * @param ArrayCollection $users
+     * @param ArrayCollection $attendees
      */
-    public function updateUsers(ArrayCollection $users): void
+    public function updateAttendees(ArrayCollection $attendees): void
     {
-        foreach ($this->users->getValues() as $value) {
-            if (!$users->contains($value)) {
-                $this->removeUser($value);
+        foreach ($this->attendees->getValues() as $value) {
+            if (!$attendees->contains($value)) {
+                $this->removeAttendee($value);
             }
         }
-        foreach ($users as $user) {
-            $this->addUser($user);
+        foreach ($attendees as $attendee) {
+            $this->addAttendee($attendee);
         }
     }
 
     /**
-     * @param User $user
+     * @param Attendee $attendee
      *
      * @return $this
      */
-    public function addUser(User $user): self
+    public function addAttendee(Attendee $attendee): self
     {
-        if (!$this->users->contains($user)) {
-            $this->users[] = $user;
-            $user->addBooking($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param User $user
-     *
-     * @return $this
-     */
-    public function removeUser(User $user): self
-    {
-        if ($this->users->contains($user)) {
-            $this->users->removeElement($user);
-            $user->removeBooking($this);
+        if (!$this->attendees->contains($attendee)) {
+            $this->attendees[] = $attendee;
+            $attendee->addBooking($this);
         }
 
         return $this;
     }
 
     /**
-     * @return Collection|Batch[]
-     */
-    public function getBatches(): Collection
-    {
-        return $this->batches;
-    }
-
-    /**
-     * @param Batch $batch
+     * @param Attendee $attendee
      *
      * @return $this
      */
-    public function addBatch(Batch $batch): self
+    public function removeAttendee(Attendee $attendee): self
     {
-        if (!$this->batches->contains($batch)) {
-            $this->batches[] = $batch;
-            $batch->addBooking($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param Batch $batch
-     *
-     * @return $this
-     */
-    public function removeBatch(Batch $batch): self
-    {
-        if ($this->batches->contains($batch)) {
-            $this->batches->removeElement($batch);
-            $batch->removeBooking($this);
+        if ($this->attendees->contains($attendee)) {
+            $this->attendees->removeElement($attendee);
+            $attendee->removeBooking($this);
         }
 
         return $this;
@@ -408,5 +370,43 @@ class Booking
     public function __toString()
     {
         return $this->summary;
+    }
+
+    /**
+     * @return Collection|Presence[]
+     */
+    public function getPresences(): Collection
+    {
+        return $this->presences;
+    }
+
+    /**
+     * @param Presence $presence
+     *
+     * @return $this
+     */
+    public function addPresence(Presence $presence): self
+    {
+        if (!$this->presences->contains($presence)) {
+            $this->presences[] = $presence;
+            $presence->setBooking($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Presence $presence
+     *
+     * @return $this
+     */
+    public function removePresence(Presence $presence): self
+    {
+        if ($this->presences->contains($presence)) {
+            $this->presences->removeElement($presence);
+            $presence->setBooking(null);
+        }
+
+        return $this;
     }
 }
