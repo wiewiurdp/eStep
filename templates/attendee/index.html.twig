@@ -34,7 +34,8 @@
                 </td>
                 <td>
                     {% for role in attendee.roles %}
-                        {{ role.name }}
+                        {{ role.batch.name }} -
+                        {{ role.name }} |
                     {% endfor %}
                 </td>
                 <td>

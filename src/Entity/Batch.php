@@ -18,7 +18,6 @@ class Batch
     {
         $this->attendees = new ArrayCollection();
         $this->roles = new ArrayCollection();
-        $this->bookings = new ArrayCollection();
     }
 
     /**
@@ -42,11 +41,6 @@ class Batch
      * @ORM\ManyToMany(targetEntity="Attendee", mappedBy="batches")
      */
     private $attendees;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Booking", inversedBy="batches")
-     */
-    private $bookings;
 
     /**
      * @return int|null
@@ -150,42 +144,6 @@ class Batch
         if ($this->attendees->contains($attendee)) {
             $this->attendees->removeElement($attendee);
             $attendee->removeBatch($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Booking[]
-     */
-    public function getBookings(): Collection
-    {
-        return $this->bookings;
-    }
-
-    /**
-     * @param Booking $booking
-     *
-     * @return $this
-     */
-    public function addBooking(Booking $booking): self
-    {
-        if (!$this->bookings->contains($booking)) {
-            $this->bookings[] = $booking;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param Booking $booking
-     *
-     * @return $this
-     */
-    public function removeBooking(Booking $booking): self
-    {
-        if ($this->bookings->contains($booking)) {
-            $this->bookings->removeElement($booking);
         }
 
         return $this;

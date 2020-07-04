@@ -28,7 +28,6 @@ final class Version20191208040459 extends AbstractMigration
         $this->addSql('ALTER TABLE attendee_booking ADD CONSTRAINT FK_E69F3F263301C60 FOREIGN KEY (booking_id) REFERENCES booking (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE role_attendee ADD CONSTRAINT FK_3B833356D60322AC FOREIGN KEY (role_id) REFERENCES role (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE role_attendee ADD CONSTRAINT FK_3B833356BCFD782A FOREIGN KEY (attendee_id) REFERENCES attendee (id) ON DELETE CASCADE');
-        $this->addSql('DROP TABLE cache_items');
         $this->addSql('DROP TABLE role_user');
         $this->addSql('DROP TABLE user');
         $this->addSql('DROP TABLE user_batch');
@@ -43,7 +42,6 @@ final class Version20191208040459 extends AbstractMigration
         $this->addSql('ALTER TABLE attendee_batch DROP FOREIGN KEY FK_F03EB766BCFD782A');
         $this->addSql('ALTER TABLE attendee_booking DROP FOREIGN KEY FK_E69F3F26BCFD782A');
         $this->addSql('ALTER TABLE role_attendee DROP FOREIGN KEY FK_3B833356BCFD782A');
-        $this->addSql('CREATE TABLE cache_items (item_id VARBINARY(255) NOT NULL, item_data MEDIUMBLOB NOT NULL, item_lifetime INT UNSIGNED DEFAULT NULL, item_time INT UNSIGNED NOT NULL, PRIMARY KEY(item_id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB COMMENT = \'\' ');
         $this->addSql('CREATE TABLE role_user (role_id INT NOT NULL, user_id INT NOT NULL, INDEX IDX_332CA4DDD60322AC (role_id), INDEX IDX_332CA4DDA76ED395 (user_id), PRIMARY KEY(role_id, user_id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB COMMENT = \'\' ');
         $this->addSql('CREATE TABLE user (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL COLLATE utf8mb4_unicode_ci, surname VARCHAR(255) NOT NULL COLLATE utf8mb4_unicode_ci, mail VARCHAR(255) NOT NULL COLLATE utf8mb4_unicode_ci, address VARCHAR(255) DEFAULT NULL COLLATE utf8mb4_unicode_ci, UNIQUE INDEX UNIQ_8D93D6495126AC48 (mail), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB COMMENT = \'\' ');
         $this->addSql('CREATE TABLE user_batch (user_id INT NOT NULL, batch_id INT NOT NULL, INDEX IDX_1AC9A98CA76ED395 (user_id), INDEX IDX_1AC9A98CF39EBE7A (batch_id), PRIMARY KEY(user_id, batch_id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB COMMENT = \'\' ');

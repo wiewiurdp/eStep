@@ -75,14 +75,9 @@ class Booking
     private $modifiedAt;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Attendee", mappedBy="bookings")
+     * @ORM\ManyToMany(targetEntity="Attendee", mappedBy="bookings" ,cascade={"persist"})
      */
     private $attendees;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Batch", mappedBy="bookings")
-     */
-    private $batches;
 
     /**
      * @var string
@@ -90,11 +85,16 @@ class Booking
     private $attendeesJSON;
 
     /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Presence", mappedBy="booking", cascade={"persist", "remove"})
+     */
+    private $presences;
+
+    /**
      */
     public function __construct()
     {
         $this->attendees = new ArrayCollection();
-        $this->batches = new ArrayCollection();
+        $this->presences = new ArrayCollection();
     }
 
     /**
@@ -283,11 +283,11 @@ class Booking
     }
 
     /**
-     * @param $googleId
+     * @param string $googleId
      *
      * @return $this
      */
-    public function setGoogleId($googleId): self
+    public function setGoogleId(string $googleId): self
     {
         $this->googleId = $googleId;
 
@@ -365,48 +365,48 @@ class Booking
     }
 
     /**
-     * @return Collection|Batch[]
-     */
-    public function getBatches(): Collection
-    {
-        return $this->batches;
-    }
-
-    /**
-     * @param Batch $batch
-     *
-     * @return $this
-     */
-    public function addBatch(Batch $batch): self
-    {
-        if (!$this->batches->contains($batch)) {
-            $this->batches[] = $batch;
-            $batch->addBooking($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param Batch $batch
-     *
-     * @return $this
-     */
-    public function removeBatch(Batch $batch): self
-    {
-        if ($this->batches->contains($batch)) {
-            $this->batches->removeElement($batch);
-            $batch->removeBooking($this);
-        }
-
-        return $this;
-    }
-
-    /**
      * @return mixed
      */
     public function __toString()
     {
         return $this->summary;
+    }
+
+    /**
+     * @return Collection|Presence[]
+     */
+    public function getPresences(): Collection
+    {
+        return $this->presences;
+    }
+
+    /**
+     * @param Presence $presence
+     *
+     * @return $this
+     */
+    public function addPresence(Presence $presence): self
+    {
+        if (!$this->presences->contains($presence)) {
+            $this->presences[] = $presence;
+            $presence->setBooking($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Presence $presence
+     *
+     * @return $this
+     */
+    public function removePresence(Presence $presence): self
+    {
+        if ($this->presences->contains($presence)) {
+            $this->presences->removeElement($presence);
+            $presence->setBooking(null);
+        }
+
+        return $this;
     }
 }

@@ -16,10 +16,8 @@ use Doctrine\ORM\EntityManagerInterface;
 class BookingRepository extends ServiceEntityRepository
 {
     /**
-     * @var EntityManagerInterface
+     * @param ManagerRegistry $registry
      */
-    private $entityManager;
-
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Booking::class);

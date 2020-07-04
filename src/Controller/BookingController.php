@@ -5,18 +5,18 @@ declare(strict_types = 1);
 namespace App\Controller;
 
 use App\Entity\Batch;
-use App\Repository\BatchRepository;
-use App\Repository\AttendeeRepository;
-use App\Service\BookingService;
-use App\Service\GoogleCalendarService;
 use App\Entity\Booking;
 use App\Form\BookingType;
+use App\Repository\BatchRepository;
 use App\Repository\BookingRepository;
+use App\Service\BookingService;
+use App\Service\GoogleCalendarService;
+use App\Service\PresenceService;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
  * @IsGranted("ROLE_USER")
@@ -30,14 +30,17 @@ class BookingController extends AbstractController
      * @var BookingService
      */
     private $bookingService;
+
+    /**
+     * @var PresenceService
+     */
+    private $presenceService;
+
     /**
      * @var BatchRepository
      */
     private $batchRepository;
-    /**
-     * @var AttendeeRepository
-     */
-    private $attendeeRepository;
+
 
     /**
      * @var Batch[]
@@ -45,21 +48,19 @@ class BookingController extends AbstractController
     private $batches;
 
     /**
-     * BookingController constructor.
-     *
      * @param GoogleCalendarService $googleCalendarService
      * @param BookingService        $bookingService
      * @param BatchRepository       $batchRepository
-     * @param AttendeeRepository    $attendeeRepository
+     * @param PresenceService       $presenceService
      */
-    public function __construct(GoogleCalendarService $googleCalendarService, BookingService $bookingService, BatchRepository $batchRepository, AttendeeRepository $attendeeRepository)
+    public function __construct(GoogleCalendarService $googleCalendarService, BookingService $bookingService, BatchRepository $batchRepository, PresenceService $presenceService)
     {
 
         $this->googleCalendarService = $googleCalendarService;
         $this->bookingService = $bookingService;
         $this->batchRepository = $batchRepository;
-        $this->attendeeRepository = $attendeeRepository;
         $this->batches = $this->batchRepository->findAll();
+        $this->presenceService = $presenceService;
     }
 
     /**
@@ -116,19 +117,17 @@ class BookingController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->bookingService->setUsers($booking);
+            $this->bookingService->transformAttendees($booking);
             $event = $this->googleCalendarService->addEvent($booking);
 
             if ($event->getRecurrence()) {
                 $events = $this->googleCalendarService->getService()->events->instances(GoogleCalendarService::CALENDAR_ID, $event->getId());
-                $this->bookingService->saveRecurrenceBookings($booking, $events);
+                $this->bookingService->processRecurrenceBookings($booking, $events);
             } else {
-                $this->bookingService->saveBooking($booking, $event);
+                $this->bookingService->processBooking($booking, $event);
             }
-
             return $this->redirectToRoute('booking_index');
         }
-
         return $this->render('booking/new.html.twig', [
             'batches' => $this->batches,
             'booking' => $booking,
@@ -142,6 +141,7 @@ class BookingController extends AbstractController
     public function show(Booking $booking): Response
     {
 
+        $this->presenceService->synchronizePresenceResponseStatus($booking);
         return $this->render('booking/show.html.twig', [
             'booking' => $booking,
         ]);
@@ -155,7 +155,8 @@ class BookingController extends AbstractController
         $form = $this->createForm(BookingType::class, $booking);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->bookingService->setUsers($booking);
+            $this->bookingService->transformAttendees($booking);
+            $this->presenceService->updatePresences($booking);
             $this->googleCalendarService->editEvent($booking);
             $this->getDoctrine()->getManager()->flush();
             return $this->redirectToRoute('booking_index');

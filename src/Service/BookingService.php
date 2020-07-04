@@ -14,20 +14,26 @@ class BookingService
     /**
      * @var EntityManagerInterface
      */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
     /**
      * @var AttendeeRepository
      */
-    private $attendeeRepository;
+    private AttendeeRepository $attendeeRepository;
+
+    /**
+     * @var PresenceService
+     */
+    private PresenceService $presenceService;
 
     /**
      * @param EntityManagerInterface $entityManager
      * @param AttendeeRepository     $attendeeRepository
      */
-    public function __construct(EntityManagerInterface $entityManager, AttendeeRepository $attendeeRepository)
+    public function __construct(EntityManagerInterface $entityManager, AttendeeRepository $attendeeRepository, PresenceService $presenceService)
     {
         $this->entityManager = $entityManager;
         $this->attendeeRepository = $attendeeRepository;
+        $this->presenceService = $presenceService;
     }
 
     /**
@@ -91,7 +97,7 @@ class BookingService
         $booking->setSummary($event->getSummary());
         $booking->setDescription($event->getDescription());
         $booking->setLocation($event->getLocation());
-        $booking = $this->updateAttendees($event, $booking);
+        $booking = $this->updateAttendeesBasedOnEvent($event, $booking);
 
         return $booking;
     }
@@ -120,9 +126,10 @@ class BookingService
      * @param Booking $booking
      * @param         $event
      */
-    public function saveBooking(Booking $booking, $event): void
+    public function processBooking(Booking $booking, $event): void
     {
         $booking->setGoogleId($event->getId());
+        $this->presenceService->createPresences($booking);
         $this->entityManager->persist($booking);
         $this->entityManager->flush();
     }
@@ -131,15 +138,28 @@ class BookingService
      * @param Booking                         $booking
      * @param \Google_Service_Calendar_Events $events
      */
-    public function saveRecurrenceBookings(Booking $booking, \Google_Service_Calendar_Events $events): void
+    public function processRecurrenceBookings(Booking $booking, \Google_Service_Calendar_Events $events): void
     {
+
         /** @var \Google_Service_Calendar_Event $item */
         foreach ($events->getItems() as $item) {
-            $recurrenceBooking = clone $booking;
-            $recurrenceBooking->setGoogleId($item->getId());
-            $recurrenceBooking->setStart(new \DateTime($item->getStart()->getDateTime()));
-            $recurrenceBooking->setEnd(new \DateTime($item->getEnd()->getDateTime()));
-            $this->entityManager->persist($recurrenceBooking);
+            if ($item->getStart()->getDateTime() == $booking->getStart()->format('Y-m-d\TH:i:sP')) {
+                $booking->setGoogleId($item->getId());
+                $this->presenceService->createPresences($booking);
+            } else {
+                $recurrenceBooking = new Booking();
+                $recurrenceBooking->setGoogleId($item->getId());
+                $recurrenceBooking->setStart(new \DateTime($item->getStart()->getDateTime()));
+                $recurrenceBooking->setEnd(new \DateTime($item->getEnd()->getDateTime()));
+                $recurrenceBooking->setSummary($booking->getSummary());
+                $recurrenceBooking->setLocation($booking->getLocation());
+                $recurrenceBooking->setRecurrence($booking->getRecurrence());
+                $recurrenceBooking->setRecurrenceFinishedOn($booking->getRecurrenceFinishedOn());
+                $recurrenceBooking->setLocation($booking->getLocation());
+                $this->presenceService->createPresences($recurrenceBooking);
+                $this->updateAttendeesBasedOnEvent($item, $recurrenceBooking);
+                $this->entityManager->persist($recurrenceBooking);
+            }
         }
         $this->entityManager->flush();
     }
@@ -150,7 +170,7 @@ class BookingService
      *
      * @return Booking
      */
-    private function updateAttendees(\Google_Service_Calendar_Event $event, Booking $booking): Booking
+    private function updateAttendeesBasedOnEvent(\Google_Service_Calendar_Event $event, Booking $booking): Booking
     {
         $attendeesEmails = null;
         $attendees = [];
@@ -162,16 +182,7 @@ class BookingService
             $attendees = $this->attendeeRepository->findBy(['mail' => $attendeesEmails]);
         }
         $attendeesCollection = new ArrayCollection($attendees);
-
-        foreach ($booking->getAttendees()->getValues() as $value) {
-
-            if (!$attendeesCollection->contains($value)) {
-                $booking->removeAttendee($value);
-            }
-        }
-        foreach ($attendeesCollection as $attendee) {
-            $booking->addAttendee($attendee);
-        }
+        $booking->updateAttendees($attendeesCollection);
 
         return $booking;
     }
@@ -179,21 +190,21 @@ class BookingService
     /**
      * @param Booking $booking
      */
-    public function setUsers(Booking $booking)
+    public function transformAttendees(Booking $booking): void
     {
 
-        if ($booking->getUsersJSON()) {
-            $usersFromJSON = json_decode($booking->getUsersJSON(), true);
-            foreach ($usersFromJSON as $item) {
-                $usersIds[] = $item['id'];
+        if ($booking->getAttendeesJSON()) {
+            $attendeesFromJSON = json_decode($booking->getAttendeesJSON(), true);
+            foreach ($attendeesFromJSON as $item) {
+                $attendeesIds[] = $item['id'];
             }
-            $users = [];
+            $attendees = [];
 
-            if (!empty($usersIds)) {
-                $users = $this->userRepository->findBy(['id' => $usersIds]);
+            if (!empty($attendeesIds)) {
+                $attendees = $this->attendeeRepository->findBy(['id' => $attendeesIds]);
             }
-            $usersCollection = new ArrayCollection($users);
-            $booking->updateUsers($usersCollection);
+            $attendeesCollection = new ArrayCollection($attendees);
+            $booking->updateAttendees($attendeesCollection);
         }
     }
 }

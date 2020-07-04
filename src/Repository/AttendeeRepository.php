@@ -35,6 +35,17 @@ class AttendeeRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function getAttendeesByBookingId($bookingId): array
+    {
+        return $this->createQueryBuilder('attendees')
+            ->select('attendees.name', 'attendees.surname')
+            ->join('attendees.bookings', 'attendees_bookings')
+            ->andWhere('attendees_bookings.id = :bookingId')
+            ->setParameter('bookingId', $bookingId)
+            ->getQuery()
+            ->getResult();
+    }
     /*
     {
         return $this->createQueryBuilder('u')

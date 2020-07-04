@@ -2,32 +2,26 @@
 
 namespace App\Form;
 
-use App\Entity\Batch;
+use App\Entity\Presence;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class BatchType extends AbstractType
+class PresenceType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('name')
-            ->add('attendees')
-        ;
+            ->add('attendee', TextType::class, ['disabled' => true])
+            ->add('stated', TextType::class, ['attr' => ['readonly' => true]])
+            ->add('actual');
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Batch::class,
+            'data_class' => Presence::class,
         ]);
     }
 }
